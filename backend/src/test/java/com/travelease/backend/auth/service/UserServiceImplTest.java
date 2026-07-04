@@ -1,0 +1,80 @@
+package com.travelease.backend.auth.service;
+
+import com.travelease.backend.auth.dto.RegisterRequest;
+import com.travelease.backend.auth.dto.UserResponse;
+import com.travelease.backend.auth.entity.Role;
+import com.travelease.backend.auth.entity.User;
+import com.travelease.backend.auth.repository.UserRepository;
+import com.travelease.backend.shared.exception.DuplicateResourceException;
+import com.travelease.backend.shared.exception.ResourceNotFoundException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class UserServiceImplTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private UserServiceImpl userService;
+
+    @Test
+    void registerSavesNewUserWithHashedPasswordAndTravelerRole() {
+        RegisterRequest request = new RegisterRequest("Asha", "asha@example.com", "9999999999", "Passw0rd1");
+        when(userRepository.existsByEmail("asha@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("Passw0rd1")).thenReturn("hashed-password");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User saved = invocation.getArgument(0);
+            saved.setId(1L);
+            return saved;
+        });
+
+        UserResponse response = userService.register(request);
+
+        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.name()).isEqualTo("Asha");
+        assertThat(response.email()).isEqualTo("asha@example.com");
+        assertThat(response.role()).isEqualTo(Role.ROLE_TRAVELER.name());
+    }
+
+    @Test
+    void registerRejectsDuplicateEmail() {
+        RegisterRequest request = new RegisterRequest("Asha", "asha@example.com", "9999999999", "Passw0rd1");
+        when(userRepository.existsByEmail("asha@example.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> userService.register(request))
+                .isInstanceOf(DuplicateResourceException.class);
+    }
+
+    @Test
+    void getByEmailReturnsUserWhenFound() {
+        User user = new User();
+        user.setEmail("asha@example.com");
+        when(userRepository.findByEmail("asha@example.com")).thenReturn(Optional.of(user));
+
+        assertThat(userService.getByEmail("asha@example.com")).isSameAs(user);
+    }
+
+    @Test
+    void getByEmailThrowsWhenNotFound() {
+        when(userRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.getByEmail("missing@example.com"))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+}
