@@ -1,6 +1,7 @@
 package com.travelease.backend.auth.entity;
 
 import com.travelease.backend.shared.entity.BaseEntity;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@AttributeOverride(name = "id", column = @Column(name = "user_id", nullable = false, updatable = false))
 @Table(name = "users")
 public class User extends BaseEntity {
 

@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -40,13 +41,13 @@ class UserServiceImplTest {
         when(passwordEncoder.encode("Passw0rd1")).thenReturn("hashed-password");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User saved = invocation.getArgument(0);
-            saved.setId(1L);
+            saved.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
             return saved;
         });
 
         UserResponse response = userService.register(request);
 
-        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.id()).isEqualTo(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         assertThat(response.name()).isEqualTo("Asha");
         assertThat(response.email()).isEqualTo("asha@example.com");
         assertThat(response.role()).isEqualTo(Role.ROLE_TRAVELER.name());

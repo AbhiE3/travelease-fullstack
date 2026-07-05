@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,7 +38,7 @@ class AuthServiceImplTest {
 
     private User existingUser() {
         User user = new User();
-        user.setId(1L);
+        user.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         user.setName("Asha");
         user.setEmail("asha@example.com");
         user.setPhone("9999999999");

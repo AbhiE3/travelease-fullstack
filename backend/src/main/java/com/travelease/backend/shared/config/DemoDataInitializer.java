@@ -1,0 +1,136 @@
+package com.travelease.backend.shared.config;
+
+import com.travelease.backend.auth.entity.Role;
+import com.travelease.backend.auth.entity.User;
+import com.travelease.backend.auth.repository.UserRepository;
+import com.travelease.backend.expense.entity.Expense;
+import com.travelease.backend.expense.entity.ExpenseParticipant;
+import com.travelease.backend.expense.repository.ExpenseRepository;
+import com.travelease.backend.settlement.entity.Settlement;
+import com.travelease.backend.settlement.entity.SettlementStatus;
+import com.travelease.backend.settlement.repository.SettlementRepository;
+import com.travelease.backend.trip.entity.Trip;
+import com.travelease.backend.trip.entity.TripMember;
+import com.travelease.backend.trip.entity.TripMemberStatus;
+import com.travelease.backend.trip.repository.TripMemberRepository;
+import com.travelease.backend.trip.repository.TripRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Component
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "app.seed-demo-data", havingValue = "true", matchIfMissing = true)
+public class DemoDataInitializer implements CommandLineRunner {
+
+    public static final UUID ALICE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    public static final UUID BOB_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    public static final UUID CARA_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
+    public static final UUID TRIP_ID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+    public static final UUID EXPENSE_ID = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+    public static final UUID SETTLEMENT_BOB_TO_ALICE_ID = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    public static final UUID SETTLEMENT_CARA_TO_ALICE_ID = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd");
+
+    private final UserRepository userRepository;
+    private final TripRepository tripRepository;
+    private final TripMemberRepository tripMemberRepository;
+    private final ExpenseRepository expenseRepository;
+    private final SettlementRepository settlementRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    @Transactional
+    public void run(String... args) {
+        User alice = getOrCreateUser(ALICE_ID, "Alice Traveler", "alice@travelease.test", "9000000001");
+        User bob = getOrCreateUser(BOB_ID, "Bob Traveler", "bob@travelease.test", "9000000002");
+        User cara = getOrCreateUser(CARA_ID, "Cara Traveler", "cara@travelease.test", "9000000003");
+
+        if (tripRepository.existsById(TRIP_ID)) {
+            return;
+        }
+
+        Trip trip = new Trip();
+        trip.setId(TRIP_ID);
+        trip.setTripName("Demo Goa Trip");
+        trip.setOrganizer(alice);
+        trip.setSourceLocation("Mumbai");
+        trip.setDestinationId(1);
+        trip.setBudgetAmount(new BigDecimal("1000.00"));
+        trip.setCategoryId(1);
+        trip.setStartDate(LocalDate.now().plusDays(10));
+        trip.setEndDate(LocalDate.now().plusDays(14));
+        trip.setStatus("PLANNED");
+        trip = tripRepository.save(trip);
+
+        addTripMember(trip, alice, "1000.00", "100.00");
+        addTripMember(trip, bob, "1000.00", "100.00");
+        addTripMember(trip, cara, "1000.00", "100.00");
+
+        Expense dinner = new Expense();
+        dinner.setId(EXPENSE_ID);
+        dinner.setTrip(trip);
+        dinner.setPayer(alice);
+        dinner.setAmount(new BigDecimal("300.00"));
+        dinner.setCategory("Food");
+        dinner.setExpenseDate(LocalDate.now());
+        dinner.setDescription("Demo shared dinner expense");
+        addExpenseParticipant(dinner, alice, "100.00");
+        addExpenseParticipant(dinner, bob, "100.00");
+        addExpenseParticipant(dinner, cara, "100.00");
+        expenseRepository.save(dinner);
+
+        addSettlement(SETTLEMENT_BOB_TO_ALICE_ID, trip, bob, alice, "100.00");
+        addSettlement(SETTLEMENT_CARA_TO_ALICE_ID, trip, cara, alice, "100.00");
+    }
+
+    private User getOrCreateUser(UUID id, String name, String email, String phone) {
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            User user = new User();
+            user.setId(id);
+            user.setName(name);
+            user.setEmail(email);
+            user.setPhone(phone);
+            user.setPasswordHash(passwordEncoder.encode("password123"));
+            user.setRole(Role.ROLE_TRAVELER);
+            return userRepository.save(user);
+        });
+    }
+
+    private void addTripMember(Trip trip, User user, String budgetAmount, String spentAmount) {
+        TripMember member = new TripMember();
+        member.setTrip(trip);
+        member.setUser(user);
+        member.setMemberStatus(TripMemberStatus.ACCEPTED);
+        member.setJoinedDate(LocalDateTime.now());
+        member.setBudgetAmount(new BigDecimal(budgetAmount));
+        member.setSpentAmount(new BigDecimal(spentAmount));
+        tripMemberRepository.save(member);
+    }
+
+    private void addExpenseParticipant(Expense expense, User user, String shareAmount) {
+        ExpenseParticipant participant = new ExpenseParticipant();
+        participant.setExpense(expense);
+        participant.setUser(user);
+        participant.setShareAmount(new BigDecimal(shareAmount));
+        expense.getParticipants().add(participant);
+    }
+
+    private void addSettlement(UUID id, Trip trip, User payer, User receiver, String amount) {
+        Settlement settlement = new Settlement();
+        settlement.setId(id);
+        settlement.setTrip(trip);
+        settlement.setPayer(payer);
+        settlement.setReceiver(receiver);
+        settlement.setAmount(new BigDecimal(amount));
+        settlement.setStatus(SettlementStatus.PENDING);
+        settlementRepository.save(settlement);
+    }
+}
