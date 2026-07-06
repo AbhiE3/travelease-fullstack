@@ -12,9 +12,11 @@ import {
   lucideBus,
   lucideCalendar,
   lucideCalendarDays,
+  lucideCheck,
   lucideCheckCircle2,
   lucideClock,
   lucideDoorOpen,
+  lucideFileText,
   lucideHome,
   lucideHotel,
   lucideLayoutDashboard,
@@ -33,6 +35,7 @@ import {
   lucideUserPlus,
   lucideUsers,
   lucideWallet,
+  lucideX,
 } from '@ng-icons/lucide';
 
 import { routes } from './app.routes';
@@ -55,9 +58,11 @@ export const appConfig: ApplicationConfig = {
       lucideBus,
       lucideCalendar,
       lucideCalendarDays,
+      lucideCheck,
       lucideCheckCircle2,
       lucideClock,
       lucideDoorOpen,
+      lucideFileText,
       lucideHotel,
       lucideLayoutDashboard,
       lucideLogOut,
@@ -75,6 +80,7 @@ export const appConfig: ApplicationConfig = {
       lucideUserPlus,
       lucideUsers,
       lucideWallet,
+      lucideX,
     }),
   ],
 };

@@ -34,14 +34,16 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'approvals',
         loadComponent: () =>
-          import('@app/shared/ui/route-placeholder/route-placeholder').then((m) => m.RoutePlaceholder),
-        data: { title: 'Partner Approvals' },
+          import('@app/features/admin/components/admin-approvals/admin-approvals').then(
+            (m) => m.AdminApprovals,
+          ),
       },
       {
         path: 'users',
         loadComponent: () =>
-          import('@app/shared/ui/route-placeholder/route-placeholder').then((m) => m.RoutePlaceholder),
-        data: { title: 'Users' },
+          import('@app/features/admin/components/admin-users/admin-users').then(
+            (m) => m.AdminUsers,
+          ),
       },
       {
         path: 'trips',
