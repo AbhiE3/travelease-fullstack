@@ -1,0 +1,64 @@
+<div hlmCard>
+  <div hlmCardHeader class="flex flex-row items-center justify-between">
+    <h3 hlmCardTitle>Trip Members</h3>
+    <hlm-dialog>
+      <button hlmDialogTrigger hlmBtn size="sm">
+        <ng-icon name="lucideUserPlus" class="h-4 w-4 mr-1" /> Invite Member
+      </button>
+      <ng-template hlmDialogPortal>
+        <hlm-dialog-content>
+          <div hlmDialogHeader>
+            <h3 hlmDialogTitle>Invite a member</h3>
+          </div>
+          <div class="space-y-3">
+            <div class="space-y-2">
+              <label hlmLabel for="invite-email">Email</label>
+              <input hlmInput id="invite-email" placeholder="friend@example.com" />
+            </div>
+            <div class="space-y-2">
+              <label hlmLabel>Role</label>
+              <hlm-select [value]="'Traveler'">
+                <hlm-select-trigger><hlm-select-value /></hlm-select-trigger>
+                <ng-template hlmSelectPortal>
+                  <hlm-select-content>
+                    <hlm-select-item value="Traveler">Traveler</hlm-select-item>
+                    <hlm-select-item value="Organizer">Organizer</hlm-select-item>
+                  </hlm-select-content>
+                </ng-template>
+              </hlm-select>
+            </div>
+          </div>
+          <div hlmDialogFooter>
+            <button hlmBtn>Send Invite</button>
+          </div>
+        </hlm-dialog-content>
+      </ng-template>
+    </hlm-dialog>
+  </div>
+  <div hlmCardContent>
+    <div class="rounded-md border">
+      <div class="grid grid-cols-12 px-4 py-2.5 text-xs font-medium text-muted-foreground bg-muted/40 border-b">
+        <div class="col-span-5">Name</div>
+        <div class="col-span-3">Role</div>
+        <div class="col-span-3">Status</div>
+        <div class="col-span-1 text-right">Action</div>
+      </div>
+      @for (m of members; track m.id) {
+        <div class="grid grid-cols-12 px-4 py-3 items-center border-b last:border-0 text-sm">
+          <div class="col-span-5 flex items-center gap-3">
+            <hlm-avatar class="h-8 w-8">
+              <span hlmAvatarFallback class="bg-primary/10 text-primary text-xs">{{ m.avatar }}</span>
+            </hlm-avatar>
+            <div>
+              <p class="font-medium">{{ m.name }}</p>
+              <p class="text-xs text-muted-foreground">{{ m.email }}</p>
+            </div>
+          </div>
+          <div class="col-span-3"><span hlmBadge variant="outline">{{ m.role }}</span></div>
+          <div class="col-span-3"><app-status-badge [status]="m.status" /></div>
+          <div class="col-span-1 text-right"><button hlmBtn variant="ghost" size="sm">···</button></div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

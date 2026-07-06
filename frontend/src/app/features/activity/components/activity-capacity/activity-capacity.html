@@ -1,0 +1,37 @@
+<app-page-header title="Manage Capacity & Timings" subtitle="Daily slot allocation across activities." />
+
+<div hlmCard>
+  <div hlmCardContent class="pt-5">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-xs text-muted-foreground border-b">
+            <th class="py-2 pl-2">Activity</th>
+            @for (s of slots; track s) {
+              <th class="py-2 text-center">{{ s }}</th>
+            }
+            <th class="py-2 text-right pr-2">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows; track row.id) {
+            <tr class="border-b last:border-0">
+              <td class="py-3 pl-2 font-medium">{{ row.name }}</td>
+              @for (cell of row.cells; track $index) {
+                <td class="py-3 text-center">
+                  <div class="inline-flex flex-col items-center gap-1">
+                    <span class="text-xs tabular-nums">{{ cell.used }}/{{ cell.cap }}</span>
+                    <div class="w-12 h-1 rounded-full bg-muted overflow-hidden">
+                      <div [class]="'h-full ' + cell.toneClass" [style.width.%]="cell.pct"></div>
+                    </div>
+                  </div>
+                </td>
+              }
+              <td class="py-3 text-right pr-2 font-semibold tabular-nums">{{ row.total }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="grid lg:grid-cols-3 gap-6">
+  <div hlmCard class="lg:col-span-2">
+    <div hlmCardHeader class="flex flex-row items-center justify-between">
+      <h3 hlmCardTitle>Day-wise Itinerary</h3>
+      <button hlmBtn size="sm"><ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Activity</button>
+    </div>
+    <div hlmCardContent class="space-y-6">
+      @for (day of itinerary; track day.day) {
+        <div class="flex gap-4">
+          <div class="text-center w-16 shrink-0">
+            <div class="rounded-md bg-primary text-primary-foreground p-2">
+              <p class="text-xs uppercase">Day</p>
+              <p class="text-xl font-bold">{{ day.day }}</p>
+            </div>
+            <p class="text-xs text-muted-foreground mt-1">{{ day.date }}</p>
+          </div>
+          <div class="flex-1 space-y-2">
+            <p class="font-medium">{{ day.title }}</p>
+            @for (it of day.items; track it.time) {
+              <div class="flex items-start gap-3 p-3 rounded-md border bg-card">
+                <ng-icon name="lucideClock" class="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div class="flex-1">
+                  <p class="text-sm font-medium">{{ it.name }}</p>
+                  <p class="text-xs text-muted-foreground">
+                    <ng-icon name="lucideMapPin" class="inline h-3 w-3" /> {{ it.location }}
+                  </p>
+                </div>
+                <span class="text-xs text-muted-foreground tabular-nums">{{ it.time }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle class="flex items-center gap-2">
+        <ng-icon name="lucideSparkles" class="h-4 w-4 text-accent" />Available Activities
+      </h3>
+      <p class="text-xs text-muted-foreground">Drag or click + to slot into a day.</p>
+    </div>
+    <div hlmCardContent class="space-y-2">
+      @for (a of activities; track a.id) {
+        <div class="flex items-center gap-3 p-2.5 rounded-md border bg-card">
+          <img [src]="a.image" alt="" class="h-12 w-12 rounded object-cover" />
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium truncate">{{ a.name }}</p>
+            <p class="text-xs text-muted-foreground">{{ a.duration }} · ₹{{ a.price.toLocaleString() }}</p>
+          </div>
+          <button hlmBtn size="sm" variant="ghost" class="h-7 w-7 p-0">
+            <ng-icon name="lucidePlus" class="h-4 w-4" />
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

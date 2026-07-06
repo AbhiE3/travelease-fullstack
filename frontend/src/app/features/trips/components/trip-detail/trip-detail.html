@@ -1,0 +1,68 @@
+<a hlmBtn variant="ghost" size="sm" class="mb-3" routerLink="/trips">
+  <ng-icon name="lucideArrowLeft" class="h-4 w-4 mr-1" />All trips
+</a>
+
+<div class="relative rounded-2xl overflow-hidden mb-6 h-56">
+  <img [src]="trip().image" alt="" class="absolute inset-0 h-full w-full object-cover" />
+  <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
+  <div class="relative h-full flex flex-col justify-end p-6 text-white">
+    <div class="flex items-center gap-2 mb-2">
+      <app-status-badge [status]="trip().status" />
+      <span hlmBadge variant="outline" class="bg-white/15 backdrop-blur border-white/30 text-white">{{
+        trip().type
+      }}</span>
+    </div>
+    <h1 class="text-3xl font-semibold">{{ trip().name }}</h1>
+    <div class="flex flex-wrap items-center gap-4 mt-2 text-sm opacity-90">
+      <span
+        ><ng-icon name="lucideMapPin" class="inline h-4 w-4 mr-1" />{{ trip().source }} →
+        {{ trip().destination }} · {{ trip().area }}</span
+      >
+      <span
+        ><ng-icon name="lucideCalendar" class="inline h-4 w-4 mr-1" />{{ trip().startDate }} →
+        {{ trip().endDate }}</span
+      >
+      <span><ng-icon name="lucideUsers" class="inline h-4 w-4 mr-1" />{{ trip().members }} members</span>
+    </div>
+  </div>
+</div>
+
+<div hlmTabs [tab]="activeTab()" (tabActivated)="activeTab.set($event)" class="w-full">
+  <div hlmTabsList class="bg-muted/50 p-1 h-auto flex-wrap">
+    @for (t of tabs; track t.id) {
+      <button [hlmTabsTrigger]="t.id" class="capitalize">{{ t.label }}</button>
+    }
+  </div>
+
+  <div [hlmTabsContent]="'overview'" class="mt-6">
+    <app-trip-overview-tab [trip]="trip()" [totalBudget]="totalBudget()" [pct]="pct()" />
+  </div>
+
+  <div [hlmTabsContent]="'members'" class="mt-6">
+    <app-trip-members-tab />
+  </div>
+
+  <div [hlmTabsContent]="'travel'" class="mt-6">
+    <app-trip-travel-tab [trip]="trip()" />
+  </div>
+
+  <div [hlmTabsContent]="'accommodation'" class="mt-6">
+    <app-trip-accommodation-tab />
+  </div>
+
+  <div [hlmTabsContent]="'expenses'" class="mt-6">
+    <app-trip-expenses-tab />
+  </div>
+
+  <div [hlmTabsContent]="'itinerary'" class="mt-6">
+    <app-trip-itinerary-tab />
+  </div>
+
+  <div [hlmTabsContent]="'alerts'" class="mt-6">
+    <app-trip-alerts-tab />
+  </div>
+
+  <div [hlmTabsContent]="'reviews'" class="mt-6">
+    <app-trip-reviews-tab />
+  </div>
+</div>

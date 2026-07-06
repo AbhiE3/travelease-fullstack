@@ -1,0 +1,18 @@
+<app-page-header title="Notifications" subtitle="Trip updates, invites, and settlements." />
+
+<div hlmCard>
+  <div hlmCardContent class="pt-5 divide-y">
+    @for (n of notificationViews; track n.id) {
+      <div class="flex gap-4 py-4">
+        <div class="h-10 w-10 rounded-md bg-primary/10 text-primary grid place-items-center">
+          <ng-icon [name]="n.icon" class="h-5 w-5" />
+        </div>
+        <div class="flex-1">
+          <p class="font-medium">{{ n.title }}</p>
+          <p class="text-sm text-muted-foreground">{{ n.desc }}</p>
+        </div>
+        <span class="text-xs text-muted-foreground">{{ n.time }}</span>
+      </div>
+    }
+  </div>
+</div>

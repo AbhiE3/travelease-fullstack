@@ -1,0 +1,116 @@
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+  @for (s of stats(); track s.label) {
+    <div hlmCard>
+      <div hlmCardContent class="pt-5">
+        <ng-icon [name]="s.icon" class="h-4 w-4 text-primary mb-2" />
+        <p class="text-xs text-muted-foreground">{{ s.label }}</p>
+        <p class="text-lg font-semibold mt-1 capitalize">{{ s.value }}</p>
+      </div>
+    </div>
+  }
+</div>
+
+<div class="grid lg:grid-cols-3 gap-6 mt-6">
+  <div hlmCard class="lg:col-span-2">
+    <div hlmCardHeader><h3 hlmCardTitle>Trip Timeline</h3></div>
+    <div hlmCardContent>
+      <div class="space-y-4">
+        @for (step of timelineSteps; track step.label; let last = $last; let i = $index) {
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <div
+                class="h-7 w-7 rounded-full grid place-items-center text-xs font-medium"
+                [class]="step.done ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground border'"
+              >
+                @if (step.done) {
+                  <ng-icon name="lucideCheckCircle2" class="h-4 w-4" />
+                } @else {
+                  {{ i + 1 }}
+                }
+              </div>
+              @if (!last) {
+                <div class="w-px flex-1" [class]="step.done ? 'bg-primary/30' : 'bg-border'"></div>
+              }
+            </div>
+            <div class="pb-4">
+              <p class="font-medium text-sm">{{ step.label }}</p>
+              <p class="text-xs text-muted-foreground">{{ step.date }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div hlmCard>
+    <div hlmCardHeader><h3 hlmCardTitle>Budget Meter</h3></div>
+    <div hlmCardContent class="space-y-4">
+      <div class="text-center py-2">
+        <div class="text-3xl font-semibold tabular-nums">{{ pct() }}%</div>
+        <p class="text-xs text-muted-foreground">of total budget used</p>
+      </div>
+      <hlm-progress [value]="pct()" class="h-3"><hlm-progress-indicator /></hlm-progress>
+      <div class="grid grid-cols-3 gap-2 text-center text-xs">
+        <div>
+          <p class="text-muted-foreground">Total</p>
+          <p class="font-semibold">₹{{ (totalBudget() / 1000).toFixed(0) }}k</p>
+        </div>
+        <div>
+          <p class="text-muted-foreground">Spent</p>
+          <p class="font-semibold">₹{{ (trip().currentCost / 1000).toFixed(1) }}k</p>
+        </div>
+        <div>
+          <p class="text-muted-foreground">Left</p>
+          <p class="font-semibold text-success">
+            ₹{{ ((totalBudget() - trip().currentCost) / 1000).toFixed(1) }}k
+          </p>
+        </div>
+      </div>
+      @if (pct() > 80) {
+        <div class="flex gap-2 p-3 rounded-md bg-warning/10 text-[oklch(0.40_0.12_75)] text-xs">
+          <ng-icon name="lucideAlertTriangle" class="h-4 w-4 shrink-0" /> Budget nearing limit —
+          review pending expenses.
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div hlmCard class="mt-6">
+  <div hlmCardHeader class="flex flex-row items-center justify-between">
+    <div>
+      <h3 hlmCardTitle class="flex items-center gap-2">
+        <ng-icon name="lucideSparkles" class="h-4 w-4 text-accent" />Recommended Activities in
+        {{ trip().destination }}
+      </h3>
+      <p class="text-xs text-muted-foreground mt-1">
+        Hand-picked based on your destination and travel dates.
+      </p>
+    </div>
+    <button hlmBtn variant="outline" size="sm">View all</button>
+  </div>
+  <div hlmCardContent>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      @for (a of recommendedActivities; track a.id) {
+        <div class="rounded-lg border overflow-hidden bg-card">
+          <div class="relative h-28">
+            <img [src]="a.image" alt="" class="h-full w-full object-cover" />
+            <span hlmBadge class="absolute top-2 left-2 bg-accent text-accent-foreground border-0 text-[10px]"
+              >Popular</span
+            >
+          </div>
+          <div class="p-3 space-y-1.5">
+            <p class="font-medium text-sm">{{ a.name }}</p>
+            <p class="text-xs text-muted-foreground">{{ a.duration }} · ★ {{ a.rating }}</p>
+            <div class="flex items-center justify-between pt-1">
+              <span class="font-semibold text-sm">₹{{ a.price.toLocaleString() }}</span>
+              <button hlmBtn size="sm" variant="outline" class="h-7 text-xs">
+                <ng-icon name="lucidePlus" class="h-3 w-3 mr-1" />Add
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<app-page-header title="Expenses" subtitle="Across all your active trips.">
+  <button hlmBtn action>
+    <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Expense
+  </button>
+</app-page-header>
+
+<div class="grid lg:grid-cols-3 gap-6">
+  <div hlmCard class="lg:col-span-2">
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>All Expenses</h3>
+    </div>
+    <div hlmCardContent class="space-y-2">
+      @for (e of expenses; track e.id) {
+        <div class="flex items-center gap-4 p-3 rounded-lg border">
+          <div class="h-10 w-10 rounded-md bg-primary/10 text-primary grid place-items-center">
+            <ng-icon name="lucideWallet" class="h-5 w-5" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium">{{ e.name }}</p>
+            <p class="text-xs text-muted-foreground">
+              Paid by {{ e.paidBy }} · split {{ e.participants.length }} ways
+            </p>
+          </div>
+          <div class="text-right">
+            <p class="font-semibold tabular-nums">₹{{ e.amount.toLocaleString() }}</p>
+            <app-status-badge [status]="e.status" />
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="space-y-4">
+    <div hlmCard>
+      <div hlmCardHeader><h3 hlmCardTitle class="text-base">You owe</h3></div>
+      <div hlmCardContent>
+        <p class="text-2xl font-semibold text-destructive">₹2,300</p>
+        <p class="text-xs text-muted-foreground mt-1">to Raj and Arun</p>
+      </div>
+    </div>
+    <div hlmCard>
+      <div hlmCardHeader><h3 hlmCardTitle class="text-base">You'll receive</h3></div>
+      <div hlmCardContent>
+        <p class="text-2xl font-semibold text-success">₹5,400</p>
+        <p class="text-xs text-muted-foreground mt-1">from Priya and Neha</p>
+      </div>
+    </div>
+  </div>
+</div>

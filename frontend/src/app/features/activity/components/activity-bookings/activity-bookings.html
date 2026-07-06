@@ -1,0 +1,28 @@
+<app-page-header title="Bookings" subtitle="Upcoming activity reservations." />
+
+<div hlmCard>
+  <div hlmCardContent class="pt-5">
+    <div class="rounded-md border">
+      <div class="grid grid-cols-12 px-4 py-2.5 text-xs font-medium text-muted-foreground bg-muted/40 border-b">
+        <div class="col-span-3">Customer</div>
+        <div class="col-span-3">Activity</div>
+        <div class="col-span-2">Date</div>
+        <div class="col-span-1">Slot</div>
+        <div class="col-span-1 text-right">Guests</div>
+        <div class="col-span-1 text-right">Total</div>
+        <div class="col-span-1 text-right">Status</div>
+      </div>
+      @for (b of bookings; track b.id) {
+        <div class="grid grid-cols-12 px-4 py-3 items-center border-b last:border-0 text-sm">
+          <div class="col-span-3 font-medium">{{ b.customer }}</div>
+          <div class="col-span-3 text-muted-foreground">{{ b.activity }}</div>
+          <div class="col-span-2">{{ b.date }}</div>
+          <div class="col-span-1 text-xs">{{ b.slot }}</div>
+          <div class="col-span-1 text-right tabular-nums">{{ b.guests }}</div>
+          <div class="col-span-1 text-right tabular-nums">₹{{ b.total.toLocaleString() }}</div>
+          <div class="col-span-1 text-right"><app-status-badge [status]="b.status" /></div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

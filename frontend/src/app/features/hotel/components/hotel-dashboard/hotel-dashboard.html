@@ -1,0 +1,121 @@
+<app-page-header title="Hotel Partner Dashboard" subtitle="Sea Breeze Resort · Baga Beach, Goa" />
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideDoorOpen" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Total Rooms</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ totalRooms }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideHotel" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Available Rooms</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ availableRooms }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideCalendarDays" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Bookings Today</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ bookingsToday }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideWallet" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Revenue (MTD)</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ revenueMtd }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-6">
+  <div hlmCard class="lg:col-span-2">
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Occupancy Calendar — June</h3>
+    </div>
+    <div hlmCardContent>
+      <div class="grid grid-cols-7 gap-2 text-xs">
+        @for (d of days; track d) {
+          <div class="text-center text-muted-foreground font-medium">{{ d }}</div>
+        }
+        @for (c of calendar; track c.day) {
+          <div
+            class="aspect-square rounded-md border p-1.5 flex flex-col justify-between"
+            [style.background]="c.background"
+          >
+            <span [class]="c.textToneClass">{{ c.day }}</span>
+            <span class="text-[10px]" [class]="c.subTextToneClass">{{ c.occ.toFixed(0) }}%</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Recent Bookings</h3>
+    </div>
+    <div hlmCardContent class="space-y-3">
+      @for (b of recentBookings; track b.id) {
+        <div class="flex items-center justify-between text-sm">
+          <div>
+            <p class="font-medium">{{ b.guest }}</p>
+            <p class="text-xs text-muted-foreground">{{ b.room }} · {{ b.checkIn }}</p>
+          </div>
+          <app-status-badge [status]="b.status" />
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div hlmCard class="mt-6">
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Room Inventory</h3>
+  </div>
+  <div hlmCardContent>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      @for (r of roomInventory; track r.id) {
+        <div class="rounded-md border p-4">
+          <p class="font-medium">{{ r.type }}</p>
+          <p class="text-xs text-muted-foreground">₹{{ r.price.toLocaleString() }}/night</p>
+          <div class="flex items-center justify-between mt-3 text-sm">
+            <span class="text-muted-foreground">Available</span>
+            <span class="font-semibold tabular-nums">{{ r.available }} / {{ r.total }}</span>
+          </div>
+          <div class="h-1.5 rounded-full bg-muted mt-2 overflow-hidden">
+            <div class="h-full bg-primary" [style.width.%]="r.pct"></div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div hlmCard class="mt-6">
+  <div hlmCardHeader>
+    <h3 hlmCardTitle class="flex items-center gap-2">
+      <ng-icon name="lucideStar" class="h-4 w-4 text-warning fill-warning" />Guest Rating Snapshot
+    </h3>
+  </div>
+  <div hlmCardContent class="flex items-center gap-8">
+    <div class="text-center">
+      <p class="text-4xl font-semibold">{{ ratingAverage }}</p>
+      <p class="text-xs text-muted-foreground">{{ ratingCount }} reviews</p>
+    </div>
+    <div class="flex-1 space-y-1.5">
+      @for (row of ratingRows; track row.stars) {
+        <div class="flex items-center gap-3 text-xs">
+          <span class="w-4">{{ row.stars }}★</span>
+          <div class="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+            <div class="h-full bg-warning" [style.width.%]="row.pct"></div>
+          </div>
+          <span class="w-8 text-right text-muted-foreground tabular-nums">{{ row.pct }}%</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,5 +1,39 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideIcons } from '@ng-icons/core';
+import {
+  lucideActivity,
+  lucideAlertTriangle,
+  lucideArrowLeft,
+  lucideArrowRight,
+  lucideBarChart3,
+  lucideBell,
+  lucideBellRing,
+  lucideBus,
+  lucideCalendar,
+  lucideCalendarDays,
+  lucideCheckCircle2,
+  lucideClock,
+  lucideDoorOpen,
+  lucideHome,
+  lucideHotel,
+  lucideLayoutDashboard,
+  lucideLogOut,
+  lucideMail,
+  lucideMapPin,
+  lucidePlane,
+  lucidePlus,
+  lucideRoute,
+  lucideSearch,
+  lucideSparkles,
+  lucideStar,
+  lucideTrendingUp,
+  lucideUser,
+  lucideUserCheck,
+  lucideUserPlus,
+  lucideUsers,
+  lucideWallet,
+} from '@ng-icons/lucide';
 
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
@@ -7,6 +41,40 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes), provideClientHydration(withEventReplay())
-  ]
+    provideRouter(routes),
+    provideClientHydration(withEventReplay()),
+    provideIcons({
+      lucideHome,
+      lucideActivity,
+      lucideAlertTriangle,
+      lucideArrowLeft,
+      lucideArrowRight,
+      lucideBarChart3,
+      lucideBell,
+      lucideBellRing,
+      lucideBus,
+      lucideCalendar,
+      lucideCalendarDays,
+      lucideCheckCircle2,
+      lucideClock,
+      lucideDoorOpen,
+      lucideHotel,
+      lucideLayoutDashboard,
+      lucideLogOut,
+      lucideMail,
+      lucideMapPin,
+      lucidePlane,
+      lucidePlus,
+      lucideRoute,
+      lucideSearch,
+      lucideSparkles,
+      lucideStar,
+      lucideTrendingUp,
+      lucideUser,
+      lucideUserCheck,
+      lucideUserPlus,
+      lucideUsers,
+      lucideWallet,
+    }),
+  ],
 };

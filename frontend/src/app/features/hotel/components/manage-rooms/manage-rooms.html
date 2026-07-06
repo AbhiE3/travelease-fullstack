@@ -1,0 +1,35 @@
+<app-page-header title="Manage Rooms" subtitle="Room types, pricing and live availability.">
+  <button hlmBtn action>
+    <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Room Type
+  </button>
+</app-page-header>
+
+<div hlmCard>
+  <div hlmCardContent class="pt-5">
+    <div class="rounded-md border">
+      <div class="grid grid-cols-12 px-4 py-2.5 text-xs font-medium text-muted-foreground bg-muted/40 border-b">
+        <div class="col-span-4">Room Type</div>
+        <div class="col-span-2 text-right">Total</div>
+        <div class="col-span-2 text-right">Available</div>
+        <div class="col-span-2 text-right">Price</div>
+        <div class="col-span-2 text-right">Occupancy</div>
+      </div>
+      @for (r of rows; track r.id) {
+        <div class="grid grid-cols-12 px-4 py-3 items-center border-b last:border-0 text-sm">
+          <div class="col-span-4 font-medium">{{ r.type }}</div>
+          <div class="col-span-2 text-right tabular-nums">{{ r.total }}</div>
+          <div class="col-span-2 text-right tabular-nums">{{ r.available }}</div>
+          <div class="col-span-2 text-right tabular-nums">₹{{ r.price.toLocaleString() }}</div>
+          <div class="col-span-2 text-right">
+            <div class="inline-flex items-center gap-2">
+              <span class="text-xs tabular-nums">{{ r.occ.toFixed(0) }}%</span>
+              <div class="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div class="h-full bg-primary" [style.width.%]="r.occ"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

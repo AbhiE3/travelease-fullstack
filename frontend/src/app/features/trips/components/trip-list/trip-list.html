@@ -1,0 +1,33 @@
+<app-page-header title="My Trips" subtitle="All your past, upcoming and in-progress trips.">
+  <a action hlmBtn routerLink="/trips/new">
+    <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" /> New Trip
+  </a>
+</app-page-header>
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+  @for (t of trips; track t.id) {
+    <a [routerLink]="['/trips', t.id]">
+      <div hlmCard class="overflow-hidden hover:shadow-[var(--shadow-elevated)] transition-shadow h-full">
+        <div class="relative h-40">
+          <img [src]="t.image" alt="" class="h-full w-full object-cover" />
+          <div class="absolute top-3 right-3"><app-status-badge [status]="t.status" /></div>
+        </div>
+        <div hlmCardContent class="pt-4 space-y-3">
+          <div>
+            <h3 class="font-semibold">{{ t.name }}</h3>
+            <app-destination-pill [from]="t.source" [to]="t.destination" />
+          </div>
+          <div class="flex items-center gap-3 text-xs text-muted-foreground">
+            <span><ng-icon name="lucideCalendar" class="inline h-3 w-3 mr-1" />{{ t.startDate }}</span>
+            <span><ng-icon name="lucideUsers" class="inline h-3 w-3 mr-1" />{{ t.members }}</span>
+            <span><ng-icon name="lucideWallet" class="inline h-3 w-3 mr-1" />₹{{ t.budgetPerPerson.toLocaleString() }}/pp</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <hlm-progress [value]="t.progress" class="h-1.5"><hlm-progress-indicator /></hlm-progress>
+            <span class="text-xs text-muted-foreground tabular-nums">{{ t.progress }}%</span>
+          </div>
+        </div>
+      </div>
+    </a>
+  }
+</div>

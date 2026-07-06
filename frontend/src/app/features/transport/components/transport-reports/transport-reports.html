@@ -1,0 +1,25 @@
+<app-page-header title="Performance Reports" subtitle="Occupancy, revenue and route profitability." />
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  @for (s of stats; track s.label) {
+    <div hlmCard>
+      <div hlmCardContent class="pt-5">
+        <p class="text-xs text-muted-foreground">{{ s.label }}</p>
+        <p class="text-2xl font-semibold mt-1">{{ s.value }}</p>
+      </div>
+    </div>
+  }
+</div>
+
+<div hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Weekly Bookings</h3>
+  </div>
+  <div hlmCardContent>
+    <div class="h-64 flex items-end gap-2">
+      @for (h of bars; track $index) {
+        <div class="flex-1 bg-primary/80 rounded-t" [style.height.%]="h"></div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+<a hlmBtn variant="ghost" size="sm" class="mb-3" routerLink="/trips">
+  <ng-icon name="lucideArrowLeft" class="h-4 w-4 mr-1" />Back to trips
+</a>
+<app-page-header
+  title="Create a new trip"
+  subtitle="Set the essentials. You can invite members and book everything next."
+/>
+
+<div hlmCard class="max-w-3xl">
+  <div hlmCardContent class="pt-6">
+    <form class="grid grid-cols-1 md:grid-cols-2 gap-5" (submit)="onSubmit($event)">
+      <div class="md:col-span-2 space-y-2">
+        <label hlmLabel for="name">Trip Name</label>
+        <input hlmInput id="name" placeholder="Goa Beach Escape" />
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel>Trip Type</label>
+        <hlm-select [value]="'Friends'">
+          <hlm-select-trigger><hlm-select-value /></hlm-select-trigger>
+          <ng-template hlmSelectPortal>
+            <hlm-select-content>
+              @for (t of tripTypes; track t) {
+                <hlm-select-item [value]="t">{{ t }}</hlm-select-item>
+              }
+            </hlm-select-content>
+          </ng-template>
+        </hlm-select>
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel for="budget">Budget per Person (₹)</label>
+        <input hlmInput id="budget" type="number" placeholder="18000" />
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel for="source">Source Location</label>
+        <input hlmInput id="source" placeholder="Bengaluru" />
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel for="destination">Destination</label>
+        <input hlmInput id="destination" placeholder="Goa" />
+      </div>
+      <div class="space-y-2 md:col-span-2">
+        <label hlmLabel>Preferred Area</label>
+        <hlm-select [value]="'Baga Beach'">
+          <hlm-select-trigger><hlm-select-value /></hlm-select-trigger>
+          <ng-template hlmSelectPortal>
+            <hlm-select-content>
+              @for (a of areas; track a) {
+                <hlm-select-item [value]="a">{{ a }}</hlm-select-item>
+              }
+            </hlm-select-content>
+          </ng-template>
+        </hlm-select>
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel for="start-date">Start Date</label>
+        <input hlmInput id="start-date" type="date" />
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel for="end-date">End Date</label>
+        <input hlmInput id="end-date" type="date" />
+      </div>
+      <div class="md:col-span-2 flex gap-3 pt-2">
+        <button hlmBtn type="submit">Create Trip</button>
+        <a hlmBtn variant="outline" routerLink="/trips">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

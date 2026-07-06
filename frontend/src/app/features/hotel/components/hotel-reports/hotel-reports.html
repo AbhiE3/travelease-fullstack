@@ -1,0 +1,24 @@
+<app-page-header title="Performance Reports" subtitle="Revenue, occupancy and rating trends." />
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  @for (s of stats; track s.label) {
+    <div hlmCard>
+      <div hlmCardContent class="pt-5">
+        <p class="text-xs text-muted-foreground">{{ s.label }}</p>
+        <p class="text-2xl font-semibold mt-1">{{ s.value }}</p>
+      </div>
+    </div>
+  }
+</div>
+
+<div hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Revenue Trend</h3>
+  </div>
+  <div hlmCardContent>
+    <svg viewBox="0 0 400 200" class="w-full h-56">
+      <polyline fill="none" stroke="var(--primary)" stroke-width="2.5" [attr.points]="linePoints" />
+      <polyline fill="var(--primary)" opacity="0.12" stroke="none" [attr.points]="areaPoints" />
+    </svg>
+  </div>
+</div>
