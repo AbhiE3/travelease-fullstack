@@ -16,10 +16,6 @@
     <h3 hlmCardTitle>Weekly Bookings</h3>
   </div>
   <div hlmCardContent>
-    <div class="h-64 flex items-end gap-2">
-      @for (h of bars; track $index) {
-        <div class="flex-1 bg-primary/80 rounded-t" [style.height.%]="h"></div>
-      }
-    </div>
+    <app-echart [options]="weeklyBookingsOptions" height="256px" />
   </div>
 </div>

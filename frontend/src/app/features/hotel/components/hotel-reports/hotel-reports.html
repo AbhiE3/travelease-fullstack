@@ -16,9 +16,6 @@
     <h3 hlmCardTitle>Revenue Trend</h3>
   </div>
   <div hlmCardContent>
-    <svg viewBox="0 0 400 200" class="w-full h-56">
-      <polyline fill="none" stroke="var(--primary)" stroke-width="2.5" [attr.points]="linePoints" />
-      <polyline fill="var(--primary)" opacity="0.12" stroke="none" [attr.points]="areaPoints" />
-    </svg>
+    <app-echart [options]="revenueChartOptions" height="224px" />
   </div>
 </div>
