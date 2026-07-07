@@ -44,7 +44,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserResponse>> me(Authentication authentication) {
         User user = userService.getByEmail(authentication.getName());
         UserResponse response = new UserResponse(
-                user.getId(), user.getName(), user.getEmail(), user.getPhone(), user.getRole().name()
+                user.getId(), user.getName(), user.getEmail(), user.getPhone(), user.getRole().name(), user.getProviderId()
         );
         return ResponseEntity.ok(ApiResponse.success(response, "Current user retrieved"));
     }

@@ -39,7 +39,7 @@ public class SeatAllocationServiceImpl implements SeatAllocationService {
     @Override
     @Transactional
     public SeatLockResponse lockSeats(SeatLockRequest request) {
-        Long userId = securityUtil.getCurrentUserId();
+        java.util.UUID userId = securityUtil.getCurrentUserId();
         Long scheduleId = request.getScheduleId();
 
         BusSchedule schedule = scheduleRepository.findById(scheduleId)
@@ -109,7 +109,7 @@ public class SeatAllocationServiceImpl implements SeatAllocationService {
     @Override
     @Transactional
     public void unlockSeats(Long scheduleId, List<Long> seatIds) {
-        Long userId = securityUtil.getCurrentUserId();
+        java.util.UUID userId = securityUtil.getCurrentUserId();
 
         for (Long seatId : seatIds) {
             Optional<SeatLock> lock = seatLockRepository
@@ -138,7 +138,7 @@ public class SeatAllocationServiceImpl implements SeatAllocationService {
 
     @Override
     @Transactional(readOnly = true)
-    public void validateSeatsForBooking(Long scheduleId, List<Long> seatIds, Long userId) {
+    public void validateSeatsForBooking(Long scheduleId, List<Long> seatIds, java.util.UUID userId) {
         List<Long> availableSeatIds = seatRepository.findAvailableSeatsForSchedule(scheduleId)
                 .stream()
                 .map(Seat::getId)
@@ -218,7 +218,7 @@ public class SeatAllocationServiceImpl implements SeatAllocationService {
 
     @Override
     @Transactional
-    public void releaseLocksForBooking(Long scheduleId, List<Long> seatIds, Long userId) {
+    public void releaseLocksForBooking(Long scheduleId, List<Long> seatIds, java.util.UUID userId) {
         for (Long seatId : seatIds) {
             Optional<SeatLock> lock = seatLockRepository
                     .findBySeatIdAndScheduleIdAndStatus(seatId, scheduleId, SeatLockStatus.LOCKED);

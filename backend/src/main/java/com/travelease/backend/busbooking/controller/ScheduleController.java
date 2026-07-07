@@ -26,6 +26,8 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+    private final com.travelease.backend.busbooking.service.BusService busService;
+    private final com.travelease.backend.busbooking.security.SecurityUtil securityUtil;
 
     @GetMapping
     @Operation(summary = "Get all schedules")
@@ -52,27 +54,31 @@ public class ScheduleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Create a new schedule")
     public ResponseEntity<ApiResponse<ScheduleResponse>> createSchedule(@Valid @RequestBody ScheduleRequest request) {
+        assertOwnsBus(request.getBusId());
         ScheduleResponse response = scheduleService.createSchedule(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(HttpStatus.CREATED.value(), "Schedule created successfully", response, "/api/schedules"));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Update schedule by ID")
     public ResponseEntity<ApiResponse<ScheduleResponse>> updateSchedule(@PathVariable Long id,
                                                                          @Valid @RequestBody ScheduleRequest request) {
+        assertOwnsSchedule(id);
+        assertOwnsBus(request.getBusId());
         ScheduleResponse response = scheduleService.updateSchedule(id, request);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Schedule updated successfully", response, "/api/schedules/" + id));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Cancel/delete schedule by ID")
     public ResponseEntity<ApiResponse<MessageResponse>> deleteSchedule(@PathVariable Long id) {
+        assertOwnsSchedule(id);
         scheduleService.deleteSchedule(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Schedule cancelled successfully", new MessageResponse("Schedule cancelled successfully"), "/api/schedules/" + id));
     }
@@ -124,5 +130,14 @@ public class ScheduleController {
         List<PopularRouteResponse> response = scheduleService.getFrequentlyBookedRoutes(limit);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(),
                 "Frequently booked routes fetched successfully", response, "/api/schedules/search/frequently-booked"));
+    }
+
+    private void assertOwnsBus(Long busId) {
+        securityUtil.resolveEffectiveProviderId(busService.getBusById(busId).getProviderId());
+    }
+
+    private void assertOwnsSchedule(Long scheduleId) {
+        ScheduleResponse existing = scheduleService.getScheduleById(scheduleId);
+        securityUtil.resolveEffectiveProviderId(existing.getBus().getProviderId());
     }
 }

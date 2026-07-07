@@ -79,9 +79,12 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     }
 
     @Override
-    public List<MaintenanceResponse> getMaintenanceRecords(Long busId, MaintenanceStatus status, Pageable pageable) {
+    public List<MaintenanceResponse> getMaintenanceRecords(Long providerId, Long busId, MaintenanceStatus status, Pageable pageable) {
         Specification<Maintenance> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            if (providerId != null) {
+                predicates.add(cb.equal(root.get("bus").get("providerId"), providerId));
+            }
             if (busId != null) {
                 predicates.add(cb.equal(root.get("bus").get("id"), busId));
             }

@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpecificationExecutor<Booking> {
@@ -36,7 +37,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
            "FROM Booking b WHERE b.userId = :userId AND b.status = 'CONFIRMED' " +
            "GROUP BY b.schedule.route.source, b.schedule.route.destination, b.schedule.route.id " +
            "ORDER BY bookingCount DESC")
-    List<Object[]> findSearchSuggestionsByUserId(@Param("userId") Long userId, Pageable pageable);
+    List<Object[]> findSearchSuggestionsByUserId(@Param("userId") UUID userId, Pageable pageable);
 
     @Query("SELECT b.schedule.route.source, b.schedule.route.destination, " +
            "b.schedule.route.id, COUNT(b) as bookingCount " +
@@ -46,7 +47,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
     List<Object[]> findFrequentlyBookedRoutes(Pageable pageable);
 
     // Phase 6 â€“ Booking lifecycle queries
-    List<Booking> findByUserIdAndStatusOrderByBookedAtDesc(Long userId, BookingStatus status);
+    List<Booking> findByUserIdAndStatusOrderByBookedAtDesc(UUID userId, BookingStatus status);
 
     // Ticket verification (fixes C-1: avoids loading all bookings)
     Optional<Booking> findByTicketNumber(String ticketNumber);
@@ -57,7 +58,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
     @Query("SELECT b FROM Booking b WHERE b.userId = :userId " +
            "AND b.status = 'CONFIRMED' " +
            "AND b.schedule.travelDate = :yesterday")
-    List<Booking> findBookingsToComplete(@Param("userId") Long userId, @Param("yesterday") LocalDate yesterday);
+    List<Booking> findBookingsToComplete(@Param("userId") UUID userId, @Param("yesterday") LocalDate yesterday);
 
     // Phase 9 â€“ Analytics queries
     @Query("SELECT COALESCE(SUM(b.totalFare), 0.0) FROM Booking b WHERE b.schedule.bus.providerId = :providerId AND b.status = 'CONFIRMED'")

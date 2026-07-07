@@ -28,7 +28,7 @@ public class SeatLock {
     private Long scheduleId;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private java.util.UUID userId;
 
     @CreationTimestamp
     @Column(name = "locked_at", updatable = false)

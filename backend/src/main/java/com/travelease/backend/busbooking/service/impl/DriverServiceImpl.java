@@ -48,6 +48,10 @@ public class DriverServiceImpl implements DriverService {
         driver.setPhone(request.getPhone());
         driver.setEmail(request.getEmail());
 
+        if (request.getStatus() != null && request.getStatus() != driver.getStatus()) {
+            driver.setStatus(request.getStatus());
+        }
+
         Driver saved = driverRepository.save(driver);
         return driverMapper.toResponse(saved);
     }
@@ -75,16 +79,6 @@ public class DriverServiceImpl implements DriverService {
         return driverRepository.findAll(spec, pageable).stream()
                 .map(driverMapper::toResponse)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public DriverResponse updateDriverStatus(Long id, DriverStatus status) {
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: " + id));
-        driver.setStatus(status);
-        Driver saved = driverRepository.save(driver);
-        return driverMapper.toResponse(saved);
     }
 
     @Override

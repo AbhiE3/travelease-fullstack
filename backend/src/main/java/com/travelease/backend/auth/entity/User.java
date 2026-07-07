@@ -32,4 +32,11 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    /**
+     * Only meaningful for ROLE_PROVIDER users - the provider this user acts as.
+     * Null for ROLE_ADMIN/ROLE_TRAVELER.
+     */
+    @Column(name = "provider_id")
+    private Long providerId;
 }

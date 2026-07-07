@@ -207,7 +207,7 @@ public class RefundServiceImpl implements RefundService {
     @Transactional(readOnly = true)
     public List<RefundResponse> getRefunds(String reference, Long bookingId, RefundStatus status, Pageable pageable) {
         Specification<Refund> spec = buildRefundSpecification(reference, bookingId, status);
-        Long currentUserId = securityUtil.getCurrentUserId();
+        java.util.UUID currentUserId = securityUtil.getCurrentUserId();
         boolean isAdmin = securityUtil.getCurrentUserRoles().contains("ROLE_ADMIN");
         if (!isAdmin) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("booking").get("userId"), currentUserId));
@@ -233,7 +233,7 @@ public class RefundServiceImpl implements RefundService {
 
     @Transactional(readOnly = true)
     public List<RefundResponse> getUserRefunds() {
-        Long userId = securityUtil.getCurrentUserId();
+        java.util.UUID userId = securityUtil.getCurrentUserId();
         return refundRepository.findByBookingUserIdOrderByInitiatedAtDesc(userId)
                 .stream().map(refundMapper::toResponse).toList();
     }

@@ -45,6 +45,11 @@ public class ConductorServiceImpl implements ConductorService {
         conductor.setName(request.getName());
         conductor.setPhone(request.getPhone());
         conductor.setEmail(request.getEmail());
+
+        if (request.getStatus() != null && request.getStatus() != conductor.getStatus()) {
+            conductor.setStatus(request.getStatus());
+        }
+
         Conductor saved = conductorRepository.save(conductor);
         return conductorMapper.toResponse(saved);
     }
@@ -72,16 +77,6 @@ public class ConductorServiceImpl implements ConductorService {
         return conductorRepository.findAll(spec, pageable).stream()
                 .map(conductorMapper::toResponse)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public ConductorResponse updateConductorStatus(Long id, ConductorStatus status) {
-        Conductor conductor = conductorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Conductor not found with id: " + id));
-        conductor.setStatus(status);
-        Conductor saved = conductorRepository.save(conductor);
-        return conductorMapper.toResponse(saved);
     }
 
     @Override
