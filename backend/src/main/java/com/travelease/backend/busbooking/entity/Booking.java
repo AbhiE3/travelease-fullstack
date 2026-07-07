@@ -26,7 +26,7 @@ public class Booking {
     private Long id;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private java.util.UUID userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)

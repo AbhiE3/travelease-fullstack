@@ -17,7 +17,5 @@ public interface ConductorService {
 
     List<ConductorResponse> getConductors(Long providerId, ConductorStatus status, Pageable pageable);
 
-    ConductorResponse updateConductorStatus(Long id, ConductorStatus status);
-
     void deactivateConductor(Long id);
 }

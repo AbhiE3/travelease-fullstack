@@ -187,7 +187,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional(readOnly = true)
     public List<SearchHistoryResponse> getSearchHistory(Pageable pageable) {
-        Long userId = securityUtil.getCurrentUserId();
+        java.util.UUID userId = securityUtil.getCurrentUserId();
         return searchHistoryRepository.findByUserId(userId, pageable).stream()
                 .map(this::mapSearchHistory)
                 .toList();
@@ -196,7 +196,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional(readOnly = true)
     public List<SearchSuggestionResponse> getSearchSuggestions(int limit) {
-        Long userId = securityUtil.getCurrentUserId();
+        java.util.UUID userId = securityUtil.getCurrentUserId();
         List<Object[]> results = bookingRepository.findSearchSuggestionsByUserId(userId, PageRequest.of(0, limit));
         return results.stream()
                 .map(row -> SearchSuggestionResponse.builder()
@@ -347,7 +347,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private void recordSearchHistory(BusSearchCriteriaRequest criteria) {
         try {
-            Long userId = securityUtil.getCurrentUserId();
+            java.util.UUID userId = securityUtil.getCurrentUserId();
             SearchHistory history = SearchHistory.builder()
                     .userId(userId)
                     .source(criteria.getSource())

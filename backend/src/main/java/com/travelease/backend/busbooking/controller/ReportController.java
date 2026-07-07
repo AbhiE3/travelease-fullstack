@@ -6,6 +6,7 @@ import com.travelease.backend.busbooking.dto.response.ApiResponse;
 import com.travelease.backend.busbooking.dto.response.ReportHistoryResponse;
 import com.travelease.backend.busbooking.dto.response.ReportResponse;
 import com.travelease.backend.busbooking.entity.enums.ReportType;
+import com.travelease.backend.busbooking.security.SecurityUtil;
 import com.travelease.backend.busbooking.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,31 +29,29 @@ import java.util.List;
 public class ReportController {
 
     private final ReportService reportService;
-
-    // ==================== REPORT GENERATION ====================
+    private final SecurityUtil securityUtil;
 
     @PostMapping("/generate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Generate report by type with filters")
     public ResponseEntity<ApiResponse<ReportResponse>> generateReport(
             @RequestParam ReportType reportType,
             @RequestBody(required = false) ReportFilterRequest filters) {
 
         if (filters == null) filters = new ReportFilterRequest();
+        filters.setProviderId(securityUtil.resolveEffectiveProviderId(filters.getProviderId()));
 
         ReportResponse response = reportService.generateReport(reportType, filters);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(),
                 response.getReportName() + " generated successfully", response, "/api/reports/generate"));
     }
 
-    // ==================== EXPORT ====================
-
     @PostMapping("/export")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Export report as CSV or Excel")
     public ResponseEntity<?> exportReport(@Valid @RequestBody ReportExportRequest request) {
         ReportFilterRequest filters = new ReportFilterRequest();
-        filters.setProviderId(request.getProviderId());
+        filters.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
         filters.setBusId(request.getBusId());
         filters.setRouteId(request.getRouteId());
         filters.setDriverId(request.getDriverId());
@@ -79,10 +78,8 @@ public class ReportController {
         }
     }
 
-    // ==================== REPORT HISTORY ====================
-
     @GetMapping("/history")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Get report history with filters")
     public ResponseEntity<ApiResponse<List<ReportHistoryResponse>>> getReportHistory(
             @RequestParam(required = false) Long providerId,
@@ -90,7 +87,8 @@ public class ReportController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @PageableDefault(size = 20, sort = "generatedAt") Pageable pageable) {
-        List<ReportHistoryResponse> response = reportService.getReportHistory(providerId, reportType, from, to, pageable);
+        Long effectiveProviderId = securityUtil.resolveEffectiveProviderId(providerId);
+        List<ReportHistoryResponse> response = reportService.getReportHistory(effectiveProviderId, reportType, from, to, pageable);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Report history fetched successfully", response, "/api/reports/history"));
     }
 }

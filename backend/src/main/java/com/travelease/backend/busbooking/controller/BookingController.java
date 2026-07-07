@@ -79,13 +79,6 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Booking modified successfully", response, "/api/bookings/modify"));
     }
 
-    @PostMapping("/{id}/complete")
-    @Operation(summary = "Complete a booking")
-    public ResponseEntity<ApiResponse<BookingResponse>> completeBooking(@PathVariable Long id) {
-        BookingResponse response = bookingService.completeBooking(id);
-        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Booking completed successfully", response, "/api/bookings/" + id + "/complete"));
-    }
-
     @GetMapping("/{id}/timeline")
     @Operation(summary = "Get booking timeline")
     public ResponseEntity<ApiResponse<List<BookingTimelineResponse>>> getBookingTimeline(@PathVariable Long id) {

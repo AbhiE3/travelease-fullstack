@@ -38,6 +38,18 @@ public class ReportServiceImpl implements ReportService {
     private final AnalyticsService analyticsService;
     private final ReportExportUtil reportExportUtil;
 
+    private static final java.util.Set<BookingStatus> SUCCESSFUL_BOOKING_STATUSES =
+            java.util.EnumSet.of(BookingStatus.CONFIRMED, BookingStatus.COMPLETED);
+    private static final java.util.Set<BookingStatus> CANCELLED_BOOKING_STATUSES =
+            java.util.EnumSet.of(BookingStatus.CANCELLED);
+
+    private void validateBookingStatusFilter(java.util.Set<BookingStatus> validStatuses, BookingStatus requested, String reportLabel) {
+        if (requested != null && !validStatuses.contains(requested)) {
+            throw new IllegalArgumentException(
+                    reportLabel + " only supports bookingStatus in " + validStatuses + ", got " + requested);
+        }
+    }
+
     @Override
     @Transactional(readOnly = true)
     public ReportResponse generateReport(ReportType reportType, ReportFilterRequest filters) {
@@ -64,7 +76,7 @@ public class ReportServiceImpl implements ReportService {
                 .collect(Collectors.toList());
 
         double totalRevenue = bookings.stream()
-                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
+                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED || b.getStatus() == BookingStatus.COMPLETED)
                 .mapToDouble(b -> b.getTotalFare() != null ? b.getTotalFare() : 0.0)
                 .sum();
 
@@ -73,7 +85,7 @@ public class ReportServiceImpl implements ReportService {
                 .totalRevenue(totalRevenue)
                 .totalBookings((long) bookings.size())
                 .totalPassengers(bookings.stream()
-                        .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
+                        .filter(b -> b.getStatus() == BookingStatus.CONFIRMED || b.getStatus() == BookingStatus.COMPLETED)
                         .mapToLong(b -> b.getBookingSeats() != null ? b.getBookingSeats().size() : 1)
                         .sum())
                 .totalCancellations(bookings.stream().filter(b -> b.getStatus() == BookingStatus.CANCELLED).count())
@@ -84,8 +96,12 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportResponse generateRevenueReport(ReportFilterRequest filters) {
+        validateBookingStatusFilter(SUCCESSFUL_BOOKING_STATUSES, filters.getBookingStatus(), "Revenue report");
+        java.util.Set<BookingStatus> effectiveStatuses = filters.getBookingStatus() != null
+                ? java.util.EnumSet.of(filters.getBookingStatus())
+                : SUCCESSFUL_BOOKING_STATUSES;
         List<Booking> bookings = getFilteredBookings(filters).stream()
-                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
+                .filter(b -> effectiveStatuses.contains(b.getStatus()))
                 .collect(Collectors.toList());
 
         List<Map<String, Object>> data = bookings.stream()
@@ -94,7 +110,7 @@ public class ReportServiceImpl implements ReportService {
                     map.put("bookingId", b.getId());
                     map.put("bookingReference", b.getBookingReference());
                     map.put("busNumber", b.getSchedule().getBus().getBusNumber());
-                    map.put("route", b.getSchedule().getRoute().getSource() + " â†’ " + b.getSchedule().getRoute().getDestination());
+                    map.put("route", b.getSchedule().getRoute().getSource() + " → " + b.getSchedule().getRoute().getDestination());
                     map.put("travelDate", b.getSchedule().getTravelDate().toString());
                     map.put("fare", b.getTotalFare());
                     map.put("couponCode", b.getCouponCode());
@@ -119,8 +135,12 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportResponse generatePassengerReport(ReportFilterRequest filters) {
+        validateBookingStatusFilter(SUCCESSFUL_BOOKING_STATUSES, filters.getBookingStatus(), "Passenger report");
+        java.util.Set<BookingStatus> effectiveStatuses = filters.getBookingStatus() != null
+                ? java.util.EnumSet.of(filters.getBookingStatus())
+                : SUCCESSFUL_BOOKING_STATUSES;
         List<Booking> bookings = getFilteredBookings(filters).stream()
-                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED || b.getStatus() == BookingStatus.COMPLETED)
+                .filter(b -> effectiveStatuses.contains(b.getStatus()))
                 .collect(Collectors.toList());
 
         List<Map<String, Object>> data = new ArrayList<>();
@@ -134,7 +154,7 @@ public class ReportServiceImpl implements ReportService {
                     map.put("passengerName", seat.getPassengerName());
                     map.put("seatNumber", seat.getSeat() != null ? seat.getSeat().getSeatNumber() : "N/A");
                     map.put("busNumber", b.getSchedule().getBus().getBusNumber());
-                    map.put("route", b.getSchedule().getRoute().getSource() + " â†’ " + b.getSchedule().getRoute().getDestination());
+                    map.put("route", b.getSchedule().getRoute().getSource() + " → " + b.getSchedule().getRoute().getDestination());
                     map.put("travelDate", b.getSchedule().getTravelDate().toString());
                     map.put("fare", perSeatFare);
                     data.add(map);
@@ -186,7 +206,7 @@ public class ReportServiceImpl implements ReportService {
                 .map(a -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("routeId", a.getRouteId());
-                    map.put("route", a.getSource() + " â†’ " + a.getDestination());
+                    map.put("route", a.getSource() + " → " + a.getDestination());
                     map.put("revenue", a.getRevenue());
                     map.put("bookingCount", a.getBookingCount());
                     map.put("passengerCount", a.getPassengerCount());
@@ -378,6 +398,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportResponse generateCancellationReport(ReportFilterRequest filters) {
+        validateBookingStatusFilter(CANCELLED_BOOKING_STATUSES, filters.getBookingStatus(), "Cancellation report");
         List<Booking> cancelledBookings = getFilteredBookings(filters).stream()
                 .filter(b -> b.getStatus() == BookingStatus.CANCELLED)
                 .collect(Collectors.toList());
@@ -388,7 +409,7 @@ public class ReportServiceImpl implements ReportService {
                     map.put("bookingId", b.getId());
                     map.put("bookingReference", b.getBookingReference());
                     map.put("busNumber", b.getSchedule().getBus().getBusNumber());
-                    map.put("route", b.getSchedule().getRoute().getSource() + " â†’ " + b.getSchedule().getRoute().getDestination());
+                    map.put("route", b.getSchedule().getRoute().getSource() + " → " + b.getSchedule().getRoute().getDestination());
                     map.put("travelDate", b.getSchedule().getTravelDate().toString());
                     map.put("totalFare", b.getTotalFare());
                     map.put("refundAmount", b.getTotalRefundAmount());
@@ -503,7 +524,7 @@ public class ReportServiceImpl implements ReportService {
         map.put("bookingReference", b.getBookingReference());
         map.put("userId", b.getUserId());
         map.put("busNumber", b.getSchedule().getBus().getBusNumber());
-        map.put("route", b.getSchedule().getRoute().getSource() + " â†’ " + b.getSchedule().getRoute().getDestination());
+        map.put("route", b.getSchedule().getRoute().getSource() + " → " + b.getSchedule().getRoute().getDestination());
         map.put("travelDate", b.getSchedule().getTravelDate().toString());
         map.put("status", b.getStatus().name());
         map.put("totalFare", b.getTotalFare());

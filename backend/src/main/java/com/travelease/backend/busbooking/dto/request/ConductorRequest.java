@@ -1,5 +1,6 @@
 package com.travelease.backend.busbooking.dto.request;
 
+import com.travelease.backend.busbooking.entity.enums.ConductorStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,4 +23,9 @@ public class ConductorRequest {
 
     private String phone;
     private String email;
+
+    // Optional: when present and different from the conductor's current status,
+    // updateConductor applies the transition. Lets PUT /conductors/{id} subsume
+    // the status-PATCH endpoint that used to live at PATCH /conductors/{id}/status.
+    private ConductorStatus status;
 }

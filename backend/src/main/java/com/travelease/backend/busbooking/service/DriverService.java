@@ -17,7 +17,5 @@ public interface DriverService {
 
     List<DriverResponse> getDrivers(Long providerId, DriverStatus status, Pageable pageable);
 
-    DriverResponse updateDriverStatus(Long id, DriverStatus status);
-
     void deactivateDriver(Long id);
 }

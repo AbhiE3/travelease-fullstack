@@ -5,6 +5,7 @@ import com.travelease.backend.busbooking.dto.response.ApiResponse;
 import com.travelease.backend.busbooking.dto.response.BusResponse;
 import com.travelease.backend.busbooking.dto.response.MessageResponse;
 import com.travelease.backend.busbooking.entity.enums.BusStatus;
+import com.travelease.backend.busbooking.security.SecurityUtil;
 import com.travelease.backend.busbooking.service.BusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,7 @@ import java.util.List;
 public class BusController {
 
     private final BusService busService;
+    private final SecurityUtil securityUtil;
 
     @GetMapping
     @Operation(summary = "Get buses with optional filters")
@@ -42,28 +44,36 @@ public class BusController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Create a new bus")
     public ResponseEntity<ApiResponse<BusResponse>> createBus(@Valid @RequestBody BusRequest request) {
+        request.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
         BusResponse response = busService.createBus(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(HttpStatus.CREATED.value(), "Bus created successfully", response, "/api/buses"));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Update bus by ID")
     public ResponseEntity<ApiResponse<BusResponse>> updateBus(@PathVariable Long id,
                                                                @Valid @RequestBody BusRequest request) {
+        assertOwnsBus(id);
+        request.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
         BusResponse response = busService.updateBus(id, request);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Bus updated successfully", response, "/api/buses/" + id));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
     @Operation(summary = "Soft delete bus by ID")
     public ResponseEntity<ApiResponse<MessageResponse>> deleteBus(@PathVariable Long id) {
+        assertOwnsBus(id);
         busService.deleteBus(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Bus deleted successfully", new MessageResponse("Bus deleted successfully"), "/api/buses/" + id));
+    }
+
+    private void assertOwnsBus(Long busId) {
+        securityUtil.resolveEffectiveProviderId(busService.getBusById(busId).getProviderId());
     }
 }

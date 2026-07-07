@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingResponse createBooking(BookingRequest request) {
-        Long userId = securityUtil.getCurrentUserId();
+        java.util.UUID userId = securityUtil.getCurrentUserId();
         BusSchedule schedule = scheduleRepository.findById(request.getScheduleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule", "id", request.getScheduleId()));
 
@@ -299,24 +299,26 @@ public class BookingServiceImpl implements BookingService {
     // COMPLETE BOOKING
     // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+    /**
+     * Completes every still-CONFIRMED booking on a schedule. Called from
+     * TripServiceImpl when a Trip transitions to COMPLETED - joins that same
+     * @Transactional call so trip completion and booking completion commit or
+     * roll back together. PENDING/RESERVED/CANCELLED/FAILED/EXPIRED bookings are
+     * left untouched, and already-COMPLETED bookings are skipped (idempotent).
+     */
     @Override
     @Transactional
-    public BookingResponse completeBooking(Long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking", "id", bookingId));
-        ensureOwnership(booking);
-
-        if (booking.getStatus() != BookingStatus.CONFIRMED) {
-            throw new BookingException("Only confirmed bookings can be completed");
+    public void completeBookingsForSchedule(Long scheduleId) {
+        List<Booking> bookings = bookingRepository.findByScheduleId(scheduleId);
+        for (Booking booking : bookings) {
+            if (booking.getStatus() != BookingStatus.CONFIRMED) {
+                continue;
+            }
+            booking.setStatus(BookingStatus.COMPLETED);
+            booking.setCompletedAt(LocalDateTime.now());
+            bookingRepository.save(booking);
+            addTimelineEntry(booking, BookingEvent.BOOKING_COMPLETED, "Booking completed automatically after trip completion");
         }
-
-        booking.setStatus(BookingStatus.COMPLETED);
-        booking.setCompletedAt(LocalDateTime.now());
-        bookingRepository.save(booking);
-
-        addTimelineEntry(booking, BookingEvent.BOOKING_COMPLETED, "Booking completed (travel date passed)");
-
-        return bookingMapper.toResponse(booking);
     }
 
     // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -378,7 +380,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public PaginatedSearchResponse<BookingHistoryResponse> getBookings(String scope, BookingStatus status, String reference, LocalDate from, LocalDate to, Pageable pageable) {
-        Long userId = securityUtil.getCurrentUserId();
+        java.util.UUID userId = securityUtil.getCurrentUserId();
         boolean isAdmin = securityUtil.getCurrentUserRoles().contains("ROLE_ADMIN");
         LocalDate today = LocalDate.now();
 
@@ -694,8 +696,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void ensureOwnership(Booking booking) {
+        if (securityUtil.getCurrentUserRoles().contains("ROLE_ADMIN")) {
+            return;
+        }
         if (!booking.getUserId().equals(securityUtil.getCurrentUserId())) {
-            throw new BookingException("You are not authorized to access this booking");
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "You are not authorized to access this booking");
         }
     }
 
@@ -729,7 +735,7 @@ public class BookingServiceImpl implements BookingService {
                 booking.getTotalFare());
     }
 
-    private Specification<Booking> buildSearchSpecification(Long userId, BookingSearchRequest criteria) {
+    private Specification<Booking> buildSearchSpecification(java.util.UUID userId, BookingSearchRequest criteria) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("userId"), userId));

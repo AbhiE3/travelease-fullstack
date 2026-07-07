@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface SeatLockRepository extends JpaRepository<SeatLock, Long> {
@@ -19,7 +20,7 @@ public interface SeatLockRepository extends JpaRepository<SeatLock, Long> {
 
     List<SeatLock> findByScheduleIdAndStatus(Long scheduleId, SeatLockStatus status);
 
-    List<SeatLock> findByUserIdAndScheduleIdAndStatus(Long userId, Long scheduleId, SeatLockStatus status);
+    List<SeatLock> findByUserIdAndScheduleIdAndStatus(UUID userId, Long scheduleId, SeatLockStatus status);
 
     List<SeatLock> findByStatusAndExpiresAtBefore(SeatLockStatus status, LocalDateTime expiresAt);
 

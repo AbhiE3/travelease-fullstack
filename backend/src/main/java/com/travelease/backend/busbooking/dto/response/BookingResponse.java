@@ -49,7 +49,7 @@ public class BookingResponse {
     private Long routeId;
     private Long providerId;
     private Long busId;
-    private Long userId;
+    private java.util.UUID userId;
 
     // Nested
     private ScheduleResponse schedule;

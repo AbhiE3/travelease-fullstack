@@ -16,7 +16,7 @@ public interface MaintenanceService {
 
     MaintenanceResponse getMaintenanceById(Long id);
 
-    List<MaintenanceResponse> getMaintenanceRecords(Long busId, MaintenanceStatus status, Pageable pageable);
+    List<MaintenanceResponse> getMaintenanceRecords(Long providerId, Long busId, MaintenanceStatus status, Pageable pageable);
 
     MaintenanceResponse transitionMaintenance(Long id, MaintenanceStatusTransitionRequest request);
 

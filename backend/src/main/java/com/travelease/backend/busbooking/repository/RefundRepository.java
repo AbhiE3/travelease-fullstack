@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface RefundRepository extends JpaRepository<Refund, Long>, JpaSpecificationExecutor<Refund> {
@@ -18,7 +19,7 @@ public interface RefundRepository extends JpaRepository<Refund, Long>, JpaSpecif
 
     Optional<Refund> findByRefundReference(String refundReference);
 
-    List<Refund> findByBookingUserIdOrderByInitiatedAtDesc(Long userId);
+    List<Refund> findByBookingUserIdOrderByInitiatedAtDesc(UUID userId);
 
     @Query("SELECT COUNT(r) FROM Refund r WHERE r.status = :status")
     Long countByStatus(@Param("status") RefundStatus status);

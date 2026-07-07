@@ -23,7 +23,7 @@ public class SearchHistory {
     private Long id;
 
     @Column(name = "user_id")
-    private Long userId;
+    private java.util.UUID userId;
 
     @Column(nullable = false)
     private String source;

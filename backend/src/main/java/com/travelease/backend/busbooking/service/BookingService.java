@@ -24,8 +24,11 @@ public interface BookingService {
     // Phase 6 Ã¢â‚¬â€œ Booking Lifecycle
     BookingResponse confirmBooking(Long bookingId);
     BookingResponse modifyBooking(BookingModificationRequest request);
-    BookingResponse completeBooking(Long bookingId);
     List<BookingTimelineResponse> getBookingTimeline(Long bookingId);
+
+    // Called from trip-completion (TripServiceImpl) - completes every CONFIRMED
+    // booking on the given schedule as part of the trip's own transaction.
+    void completeBookingsForSchedule(Long scheduleId);
 
     // Phase 6 Ã¢â‚¬â€œ Ticket Management
     TicketResponse getTicket(Long bookingId);

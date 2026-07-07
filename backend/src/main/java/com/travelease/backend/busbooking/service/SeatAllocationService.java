@@ -16,11 +16,11 @@ public interface SeatAllocationService {
 
     void releaseExpiredLocks();
 
-    void validateSeatsForBooking(Long scheduleId, List<Long> seatIds, Long userId);
+    void validateSeatsForBooking(Long scheduleId, List<Long> seatIds, java.util.UUID userId);
 
     List<Seat> findConsecutiveSeats(Long scheduleId, int count, SeatType preference);
 
     void validateLadiesSeats(List<Seat> seats, Map<Long, String> passengerGenderBySeatId);
 
-    void releaseLocksForBooking(Long scheduleId, List<Long> seatIds, Long userId);
+    void releaseLocksForBooking(Long scheduleId, List<Long> seatIds, java.util.UUID userId);
 }

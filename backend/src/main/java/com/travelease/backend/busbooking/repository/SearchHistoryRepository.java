@@ -8,19 +8,20 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Long> {
 
-    List<SearchHistory> findByUserIdOrderBySearchedAtDesc(Long userId);
+    List<SearchHistory> findByUserIdOrderBySearchedAtDesc(UUID userId);
 
-    List<SearchHistory> findByUserId(Long userId, Pageable pageable);
+    List<SearchHistory> findByUserId(UUID userId, Pageable pageable);
 
     @Query("SELECT sh.source, sh.destination FROM SearchHistory sh " +
            "WHERE sh.userId = :userId " +
            "GROUP BY sh.source, sh.destination " +
            "ORDER BY MAX(sh.searchedAt) DESC")
-    List<Object[]> findRecentlySearchedRoutes(@Param("userId") Long userId, Pageable pageable);
+    List<Object[]> findRecentlySearchedRoutes(@Param("userId") UUID userId, Pageable pageable);
 
     @Query("SELECT sh.source, sh.destination, COUNT(sh) as searchCount FROM SearchHistory sh " +
            "GROUP BY sh.source, sh.destination " +

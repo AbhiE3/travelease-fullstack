@@ -32,6 +32,7 @@ public class TripServiceImpl implements TripService {
     private final ConductorRepository conductorRepository;
     private final BusRepository busRepository;
     private final TripMapper tripMapper;
+    private final com.travelease.backend.busbooking.service.BookingService bookingService;
 
     @Override
     @Transactional
@@ -191,6 +192,7 @@ public class TripServiceImpl implements TripService {
                     conductor.setStatus(ConductorStatus.AVAILABLE);
                     conductorRepository.save(conductor);
                 }
+                bookingService.completeBookingsForSchedule(trip.getSchedule().getId());
                 break;
 
             case CANCELLED:
