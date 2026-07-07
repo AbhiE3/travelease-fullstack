@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { NgIcon } from '@ng-icons/core';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { PageHeader } from '@app/shared/ui/page-header/page-header';
+import { EChart } from '@app/shared/ui/echart/echart';
+import type { EChartsCoreOption } from 'echarts/core';
+import { CHART_COLORS } from '@app/shared/ui/echart/echart-theme';
 
 interface ReportStat {
   label: string;
@@ -32,18 +35,35 @@ const TOP_DESTINATIONS: TopDestinationRow[] = [
   { name: 'Jaipur', trips: 38 },
 ];
 
-export const REVENUE_TREND_LINE_POINTS =
-  '0,160 40,140 80,150 120,110 160,120 200,80 240,90 280,60 320,70 360,40 400,30';
-export const REVENUE_TREND_AREA_POINTS = `${REVENUE_TREND_LINE_POINTS} 400,200 0,200`;
+export function buildRevenueLineChartOption(data: number[]): EChartsCoreOption {
+  return {
+    animationDuration: 1800,
+    grid: { left: -10, right: -10, top: 10, bottom: -10, containLabel: false },
+    xAxis: { type: 'category', show: false, boundaryGap: false },
+    yAxis: { type: 'value', show: false, max: 200 },
+    tooltip: { trigger: 'axis' },
+    series: [
+      {
+        type: 'line',
+        data,
+        smooth: false,
+        symbol: 'none',
+        lineStyle: { color: CHART_COLORS.primary, width: 2.5 },
+        areaStyle: { color: CHART_COLORS.primary, opacity: 0.12 },
+      },
+    ],
+  };
+}
 
 @Component({
   selector: 'app-admin-reports',
-  imports: [NgIcon, HlmCardImports, PageHeader],
+  imports: [NgIcon, HlmCardImports, PageHeader, EChart],
   templateUrl: './admin-reports.html',
 })
 export class AdminReports {
   public readonly stats = STATS;
   public readonly destinations = TOP_DESTINATIONS;
-  public readonly linePoints = REVENUE_TREND_LINE_POINTS;
-  public readonly areaPoints = REVENUE_TREND_AREA_POINTS;
+  public readonly revenueChartOptions = buildRevenueLineChartOption([
+    40, 60, 50, 90, 80, 120, 110, 140, 130, 160, 170
+  ]);
 }
