@@ -3,6 +3,13 @@ package com.travelease.backend.shared.config;
 import com.travelease.backend.auth.entity.Role;
 import com.travelease.backend.auth.entity.User;
 import com.travelease.backend.auth.repository.UserRepository;
+import com.travelease.backend.busbooking.entity.Bus;
+import com.travelease.backend.busbooking.entity.BusSchedule;
+import com.travelease.backend.busbooking.entity.Route;
+import com.travelease.backend.busbooking.entity.enums.BusType;
+import com.travelease.backend.busbooking.repository.BusRepository;
+import com.travelease.backend.busbooking.repository.BusScheduleRepository;
+import com.travelease.backend.busbooking.repository.RouteRepository;
 import com.travelease.backend.expense.entity.Expense;
 import com.travelease.backend.expense.entity.ExpenseParticipant;
 import com.travelease.backend.expense.repository.ExpenseRepository;
@@ -10,6 +17,7 @@ import com.travelease.backend.settlement.entity.Settlement;
 import com.travelease.backend.settlement.entity.SettlementStatus;
 import com.travelease.backend.settlement.repository.SettlementRepository;
 import com.travelease.backend.trip.entity.Trip;
+import com.travelease.backend.trip.entity.TripStatus;
 import com.travelease.backend.trip.entity.TripMember;
 import com.travelease.backend.trip.entity.TripMemberStatus;
 import com.travelease.backend.trip.repository.TripMemberRepository;
@@ -24,13 +32,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.seed-demo-data", havingValue = "true", matchIfMissing = true)
 public class DemoDataInitializer implements CommandLineRunner {
 
+    public static final UUID ADMIN_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     public static final UUID ALICE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     public static final UUID BOB_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
     public static final UUID CARA_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
@@ -45,14 +56,24 @@ public class DemoDataInitializer implements CommandLineRunner {
     private final ExpenseRepository expenseRepository;
     private final SettlementRepository settlementRepository;
     private final PasswordEncoder passwordEncoder;
+    
+    private final BusRepository busRepository;
+    private final RouteRepository routeRepository;
+    private final BusScheduleRepository busScheduleRepository;
 
     @Override
     @Transactional
     public void run(String... args) {
-        User alice = getOrCreateUser(ALICE_ID, "Alice Traveler", "alice@travelease.test", "9000000001");
-        User bob = getOrCreateUser(BOB_ID, "Bob Traveler", "bob@travelease.test", "9000000002");
-        User cara = getOrCreateUser(CARA_ID, "Cara Traveler", "cara@travelease.test", "9000000003");
+        User admin = getOrCreateUser(ADMIN_ID, "Admin User", "admin@travelease.test", "9000000000", Role.ROLE_ADMIN);
+        User alice = getOrCreateUser(ALICE_ID, "Alice Traveler", "alice@travelease.test", "9000000001", Role.ROLE_TRAVELER);
+        User bob = getOrCreateUser(BOB_ID, "Bob Traveler", "bob@travelease.test", "9000000002", Role.ROLE_TRAVELER);
+        User cara = getOrCreateUser(CARA_ID, "Cara Traveler", "cara@travelease.test", "9000000003", Role.ROLE_TRAVELER);
 
+        seedExpenseData(alice, bob, cara);
+        seedBusBookingData(admin);
+    }
+
+    private void seedExpenseData(User alice, User bob, User cara) {
         if (tripRepository.existsById(TRIP_ID)) {
             return;
         }
@@ -67,7 +88,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         trip.setCategoryId(1);
         trip.setStartDate(LocalDate.now().plusDays(10));
         trip.setEndDate(LocalDate.now().plusDays(14));
-        trip.setStatus("PLANNED");
+        trip.setStatus(TripStatus.PLANNED);
         trip = tripRepository.save(trip);
 
         addTripMember(trip, alice, "1000.00", "100.00");
@@ -91,7 +112,39 @@ public class DemoDataInitializer implements CommandLineRunner {
         addSettlement(SETTLEMENT_CARA_TO_ALICE_ID, trip, cara, alice, "100.00");
     }
 
-    private User getOrCreateUser(UUID id, String name, String email, String phone) {
+    private void seedBusBookingData(User admin) {
+        if (busRepository.count() > 0) {
+            return;
+        }
+
+        Route route = new Route();
+        route.setSource("Mumbai");
+        route.setDestination("Pune");
+        route.setDistanceKm(150.0);
+        route.setDurationHours(3.5);
+        route = routeRepository.save(route);
+
+        Bus bus = new Bus();
+        bus.setBusNumber("MH-01-AB-1234");
+        bus.setBusName("Volvo Demo Sleeper");
+        bus.setTotalSeats(40);
+        bus.setBusType(BusType.AC_SLEEPER);
+        bus.setProviderId(1L); // Mock provider ID for testing
+        bus.setAmenities(List.of("WiFi", "Blanket", "Water Bottle"));
+        bus = busRepository.save(bus);
+
+        BusSchedule schedule = new BusSchedule();
+        schedule.setBus(bus);
+        schedule.setRoute(route);
+        schedule.setTravelDate(LocalDate.now().plusDays(5));
+        schedule.setDepartureTime(LocalTime.of(8, 0));
+        schedule.setArrivalTime(LocalTime.of(11, 30));
+        schedule.setFare(500.0);
+        schedule.setAvailableSeats(bus.getTotalSeats());
+        busScheduleRepository.save(schedule);
+    }
+
+    private User getOrCreateUser(UUID id, String name, String email, String phone, Role role) {
         return userRepository.findByEmail(email).orElseGet(() -> {
             User user = new User();
             user.setId(id);
@@ -99,7 +152,7 @@ public class DemoDataInitializer implements CommandLineRunner {
             user.setEmail(email);
             user.setPhone(phone);
             user.setPasswordHash(passwordEncoder.encode("password123"));
-            user.setRole(Role.ROLE_TRAVELER);
+            user.setRole(role);
             return userRepository.save(user);
         });
     }

@@ -1,0 +1,22 @@
+<app-page-header title="Manage Vehicles" subtitle="Fleet inventory and status.">
+  <button hlmBtn action>
+    <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Vehicle
+  </button>
+</app-page-header>
+
+<div class="grid md:grid-cols-2 gap-4">
+  @for (v of vehicles; track v.id) {
+    <div hlmCard>
+      <div hlmCardContent class="pt-5 flex items-center gap-4">
+        <div class="h-12 w-12 rounded-md bg-primary/10 text-primary grid place-items-center">
+          <ng-icon name="lucideBus" class="h-6 w-6" />
+        </div>
+        <div class="flex-1">
+          <p class="font-medium">{{ v.name }}</p>
+          <p class="text-xs text-muted-foreground">{{ v.reg }} · {{ v.capacity }} seats</p>
+        </div>
+        <app-status-badge [status]="v.status" />
+      </div>
+    </div>
+  }
+</div>

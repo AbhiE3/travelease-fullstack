@@ -1,0 +1,54 @@
+<div class="min-h-screen bg-background">
+  <header class="border-b">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a routerLink="/" class="flex items-center gap-2 font-semibold">
+        <div class="h-9 w-9 rounded-lg bg-primary text-primary-foreground grid place-items-center font-bold">
+          T
+        </div>
+        TravelEase
+      </a>
+      <div class="flex items-center gap-3">
+        <a hlmBtn variant="ghost" routerLink="/login">Sign in</a>
+        <a hlmBtn routerLink="/register">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-5">
+        <ng-icon name="lucidePlane" class="h-3.5 w-3.5" /> Collaborative trip OS
+      </div>
+      <h1 class="text-5xl font-semibold tracking-tight text-foreground leading-[1.05]">
+        Plan group trips end-to-end, without the chaos.
+      </h1>
+      <p class="mt-5 text-lg text-muted-foreground max-w-xl">
+        TravelEase brings invitations, bus seats, accommodations, expenses, itineraries and
+        disruption alerts into one calm dashboard.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a hlmBtn size="lg" routerLink="/dashboard">
+          Open dashboard <ng-icon name="lucideArrowRight" class="ml-1 h-4 w-4" />
+        </a>
+        <a hlmBtn size="lg" variant="outline" routerLink="/admin">Admin console</a>
+      </div>
+    </div>
+    <div class="rounded-2xl overflow-hidden shadow-[var(--shadow-elevated)] border bg-card">
+      <img
+        src="/images/landing-hero.jpg"
+        alt="Group trip"
+        class="w-full h-[420px] object-cover"
+      />
+    </div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-6 pb-20 grid md:grid-cols-4 gap-4">
+    @for (f of features; track f.title) {
+      <div class="p-5 rounded-xl border bg-card">
+        <ng-icon [name]="f.icon" class="h-5 w-5 text-primary mb-3" />
+        <div class="font-medium">{{ f.title }}</div>
+        <p class="text-sm text-muted-foreground mt-1">{{ f.desc }}</p>
+      </div>
+    }
+  </section>
+</div>

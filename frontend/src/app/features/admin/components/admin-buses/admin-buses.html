@@ -1,0 +1,85 @@
+<app-page-header title="Bus Management" subtitle="Add and manage bus inventory and availability.">
+  <hlm-dialog action>
+    <button hlmDialogTrigger hlmBtn>
+      <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Bus
+    </button>
+    <ng-template hlmDialogPortal>
+      <hlm-dialog-content>
+        <div hlmDialogHeader>
+          <h3 hlmDialogTitle>Add Bus</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="bus-name">Bus Name</label>
+            <input hlmInput id="bus-name" placeholder="Volvo Multi-Axle" />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="bus-operator">Operator</label>
+            <input hlmInput id="bus-operator" />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="bus-seats">Seats</label>
+            <input hlmInput id="bus-seats" type="number" />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="bus-source">Source</label>
+            <input hlmInput id="bus-source" />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="bus-destination">Destination</label>
+            <input hlmInput id="bus-destination" />
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="bus-price">Price (₹)</label>
+            <input hlmInput id="bus-price" type="number" />
+          </div>
+        </div>
+        <div hlmDialogFooter>
+          <button hlmBtn>Save Bus</button>
+        </div>
+      </hlm-dialog-content>
+    </ng-template>
+  </hlm-dialog>
+</app-page-header>
+
+<div hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Fleet</h3>
+  </div>
+  <div hlmCardContent>
+    <div class="rounded-md border">
+      <div class="grid grid-cols-12 px-4 py-2.5 text-xs font-medium text-muted-foreground bg-muted/40 border-b">
+        <div class="col-span-3">Bus</div>
+        <div class="col-span-2">Operator</div>
+        <div class="col-span-1">Route</div>
+        <div class="col-span-1">Seats</div>
+        <div class="col-span-1">Price</div>
+        <div class="col-span-1">Rating</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-1">Approval</div>
+      </div>
+      @for (b of rows; track b.id) {
+        <div class="grid grid-cols-12 px-4 py-3 items-center border-b last:border-0 text-sm">
+          <div class="col-span-3"><p class="font-medium">{{ b.name }}</p></div>
+          <div class="col-span-2">{{ b.operator }}</div>
+          <div class="col-span-1 text-xs">Bengaluru → Goa</div>
+          <div class="col-span-1">{{ b.seats }}</div>
+          <div class="col-span-1">₹{{ b.price }}</div>
+          <div class="col-span-1 flex items-center gap-1">
+            <ng-icon name="lucideStar" class="h-3 w-3 fill-warning text-warning" />{{ b.rating }}
+          </div>
+          <div class="col-span-2">
+            <span hlmBadge variant="outline" [class]="b.statusClass">{{ b.status }}</span>
+          </div>
+          <div class="col-span-1">
+            @if (approvedIds().has(b.id)) {
+              <app-status-badge status="Accepted" />
+            } @else {
+              <button hlmBtn size="sm" (click)="approve(b.id)">Approve</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

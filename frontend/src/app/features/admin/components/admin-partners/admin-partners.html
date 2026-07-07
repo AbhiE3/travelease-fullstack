@@ -1,0 +1,19 @@
+<app-page-header title="Partner Analytics" subtitle="Performance ranking across hotel, transport and activity partners." />
+
+<div hlmTabs [tab]="activeTab()" (tabActivated)="activeTab.set($event)" class="w-full">
+  <div hlmTabsList class="bg-muted/50 p-1">
+    <button [hlmTabsTrigger]="'hotels'">Hotels</button>
+    <button [hlmTabsTrigger]="'transport'">Transport</button>
+    <button [hlmTabsTrigger]="'activity'">Activity Providers</button>
+  </div>
+
+  <div [hlmTabsContent]="'hotels'" class="mt-6">
+    <app-partner-ranking-table [data]="hotelPartners" label="Hotel" />
+  </div>
+  <div [hlmTabsContent]="'transport'" class="mt-6">
+    <app-partner-ranking-table [data]="transportPartners" label="Transport" />
+  </div>
+  <div [hlmTabsContent]="'activity'" class="mt-6">
+    <app-partner-ranking-table [data]="activityPartners" label="Activity Provider" />
+  </div>
+</div>

@@ -1,0 +1,24 @@
+<h1 class="text-2xl font-semibold tracking-tight">Welcome back</h1>
+<p class="text-sm text-muted-foreground mt-1 mb-6">Sign in to manage your trips and travel plans.</p>
+
+<form class="space-y-4" (submit)="onSubmit($event, usernameInput.value, passwordInput.value)">
+  <div class="space-y-2">
+    <label hlmLabel for="username">Username</label>
+    <input hlmInput id="username" type="text" placeholder="e.g. admin" #usernameInput />
+  </div>
+  <div class="space-y-2">
+    <div class="flex items-center justify-between">
+      <label hlmLabel for="password">Password</label>
+      <a routerLink="/login" class="text-xs text-primary">Forgot password?</a>
+    </div>
+    <input hlmInput id="password" type="password" placeholder="••••••••" #passwordInput />
+  </div>
+  @if (error()) {
+    <p class="text-xs text-destructive">{{ error() }}</p>
+  }
+  <button hlmBtn type="submit" class="w-full">Sign in</button>
+</form>
+
+<p class="text-sm text-muted-foreground mt-6 text-center">
+  Don't have an account? <a routerLink="/register" class="text-primary font-medium">Sign up</a>
+</p>

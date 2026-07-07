@@ -1,0 +1,40 @@
+<app-page-header title="Reports & Analytics" subtitle="Platform performance, revenue and occupancy." />
+
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+  @for (s of stats; track s.label) {
+    <div hlmCard>
+      <div hlmCardContent class="pt-5">
+        <ng-icon [name]="s.icon" class="h-4 w-4 text-primary mb-2" />
+        <p class="text-xs text-muted-foreground">{{ s.label }}</p>
+        <p class="text-xl font-semibold mt-0.5">{{ s.value }}</p>
+      </div>
+    </div>
+  }
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Revenue Trend</h3>
+    </div>
+    <div hlmCardContent>
+      <app-echart [options]="revenueChartOptions" height="224px" />
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Top Destinations</h3>
+    </div>
+    <div hlmCardContent class="space-y-3">
+      @for (d of destinations; track d.name) {
+        <div class="flex items-center gap-3">
+          <span class="w-24 text-sm">{{ d.name }}</span>
+          <div class="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+            <div class="h-full bg-primary" [style.width.%]="d.trips"></div>
+          </div>
+          <span class="text-xs text-muted-foreground w-10 text-right tabular-nums">{{ d.trips }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

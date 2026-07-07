@@ -1,0 +1,41 @@
+<app-page-header title="Profile" subtitle="Manage your account and travel preferences." />
+
+<div class="grid lg:grid-cols-3 gap-6">
+  <div hlmCard>
+    <div hlmCardContent class="pt-6 text-center">
+      <hlm-avatar class="h-24 w-24 mx-auto mb-3">
+        <span hlmAvatarFallback class="bg-primary text-primary-foreground text-2xl">SR</span>
+      </hlm-avatar>
+      <h3 class="font-semibold">{{ name }}</h3>
+      <p class="text-sm text-muted-foreground">{{ email }}</p>
+      <button hlmBtn variant="outline" size="sm" class="mt-4">Change photo</button>
+    </div>
+  </div>
+  <div hlmCard class="lg:col-span-2">
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Account details</h3>
+    </div>
+    <div hlmCardContent class="grid md:grid-cols-2 gap-4">
+      <div class="space-y-2">
+        <label hlmLabel>Name</label>
+        <input hlmInput [value]="name" />
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel>Email</label>
+        <input hlmInput [value]="email" />
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel>Phone</label>
+        <input hlmInput [value]="phone" />
+      </div>
+      <div class="space-y-2">
+        <label hlmLabel>Default city</label>
+        <input hlmInput [value]="defaultCity" />
+      </div>
+      <div class="md:col-span-2 flex gap-3">
+        <button hlmBtn>Save changes</button>
+        <button hlmBtn variant="outline">Change password</button>
+      </div>
+    </div>
+  </div>
+</div>

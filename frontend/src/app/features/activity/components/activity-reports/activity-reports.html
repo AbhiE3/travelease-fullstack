@@ -1,0 +1,20 @@
+<app-page-header title="Performance Reports" subtitle="Revenue by activity and slot utilization." />
+
+<div hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Revenue per Activity</h3>
+  </div>
+  <div hlmCardContent class="space-y-3">
+    @for (r of revenueByActivity; track r.id) {
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span class="font-medium">{{ r.name }}</span>
+          <span class="tabular-nums text-muted-foreground">₹{{ r.revenue.toLocaleString() }}</span>
+        </div>
+        <div class="h-2 rounded-full bg-muted overflow-hidden">
+          <div class="h-full bg-accent" [style.width.%]="r.pct"></div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

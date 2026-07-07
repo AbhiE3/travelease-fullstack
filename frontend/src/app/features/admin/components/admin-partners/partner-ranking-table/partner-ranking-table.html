@@ -1,0 +1,67 @@
+<div class="space-y-6">
+  <div class="grid md:grid-cols-2 gap-4">
+    <div hlmCard class="border-success/30 bg-success/5">
+      <div hlmCardContent class="pt-5">
+        <div class="flex items-center gap-2 text-success mb-1">
+          <ng-icon name="lucideAward" class="h-4 w-4" />
+          <p class="text-xs font-medium uppercase tracking-wide">Top {{ label() }}</p>
+        </div>
+        <p class="text-lg font-semibold">{{ top().name }}</p>
+        <p class="text-xs text-muted-foreground">
+          {{ top().city }} · ₹{{ top().revenue.toLocaleString() }} revenue · ★ {{ top().rating }}
+        </p>
+      </div>
+    </div>
+    <div hlmCard class="border-destructive/30 bg-destructive/5">
+      <div hlmCardContent class="pt-5">
+        <div class="flex items-center gap-2 text-destructive mb-1">
+          <ng-icon name="lucideTrendingDown" class="h-4 w-4" />
+          <p class="text-xs font-medium uppercase tracking-wide">Needs Attention</p>
+        </div>
+        <p class="text-lg font-semibold">{{ needsAttention().name }}</p>
+        <p class="text-xs text-muted-foreground">
+          {{ needsAttention().city }} · {{ needsAttention().cancellation }}% cancellations · ★
+          {{ needsAttention().rating }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Ranking</h3>
+    </div>
+    <div hlmCardContent>
+      <div class="rounded-md border">
+        <div class="grid grid-cols-12 px-4 py-2.5 text-xs font-medium text-muted-foreground bg-muted/40 border-b">
+          <div class="col-span-1">#</div>
+          <div class="col-span-3">Partner</div>
+          <div class="col-span-2">City</div>
+          <div class="col-span-1 text-right">Bookings</div>
+          <div class="col-span-2 text-right">Revenue</div>
+          <div class="col-span-1 text-right">Cancel</div>
+          <div class="col-span-1 text-right">Rating</div>
+          <div class="col-span-1 text-right">Status</div>
+        </div>
+        @for (p of sorted(); track p.id) {
+          <div class="grid grid-cols-12 px-4 py-3 items-center border-b last:border-0 text-sm">
+            <div class="col-span-1 font-semibold text-muted-foreground">#{{ p.rank }}</div>
+            <div class="col-span-3 font-medium">{{ p.name }}</div>
+            <div class="col-span-2 text-muted-foreground">{{ p.city }}</div>
+            <div class="col-span-1 text-right tabular-nums">{{ p.bookings }}</div>
+            <div class="col-span-2 text-right tabular-nums">₹{{ p.revenue.toLocaleString() }}</div>
+            <div class="col-span-1 text-right">
+              <span hlmBadge variant="outline" [class]="p.cancellationClass">{{ p.cancellation }}%</span>
+            </div>
+            <div class="col-span-1 text-right text-xs">
+              <span class="inline-flex items-center gap-1">
+                <ng-icon name="lucideStar" class="h-3 w-3 fill-warning text-warning" />{{ p.rating }}
+              </span>
+            </div>
+            <div class="col-span-1 text-right"><app-status-badge [status]="p.badgeStatus" /></div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<app-page-header title="Partner Approvals" subtitle="Review and approve new hotel, transport and activity partner registrations." />
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <p class="text-xs text-muted-foreground">Pending</p>
+      <p class="text-2xl font-semibold mt-1 tabular-nums">{{ pendingCount }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <p class="text-xs text-muted-foreground">Hotels</p>
+      <p class="text-2xl font-semibold mt-1 tabular-nums">{{ hotelCount }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <p class="text-xs text-muted-foreground">Transport</p>
+      <p class="text-2xl font-semibold mt-1 tabular-nums">{{ transportCount }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <p class="text-xs text-muted-foreground">Activity</p>
+      <p class="text-2xl font-semibold mt-1 tabular-nums">{{ activityCount }}</p>
+    </div>
+  </div>
+</div>
+
+<div hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Awaiting Review</h3>
+  </div>
+  <div hlmCardContent class="space-y-3">
+    @for (p of approvals; track p.id) {
+      <div class="flex items-center gap-4 p-4 rounded-lg border bg-card">
+        <div class="h-11 w-11 rounded-md bg-primary/10 text-primary grid place-items-center">
+          <ng-icon [name]="p.icon" class="h-5 w-5" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <p class="font-medium">{{ p.name }}</p>
+            <span hlmBadge variant="outline">{{ p.type }}</span>
+          </div>
+          <p class="text-xs text-muted-foreground mt-0.5">{{ p.city }} · Registered {{ p.registered }}</p>
+        </div>
+        <button hlmBtn variant="outline" size="sm">
+          <ng-icon name="lucideFileText" class="h-4 w-4 mr-1" />{{ p.documents }} docs
+        </button>
+        <button
+          hlmBtn
+          variant="outline"
+          size="sm"
+          class="text-destructive border-destructive/30 hover:bg-destructive/10"
+        >
+          <ng-icon name="lucideX" class="h-4 w-4 mr-1" />Reject
+        </button>
+        <button hlmBtn size="sm" class="bg-success text-success-foreground hover:bg-success/90">
+          <ng-icon name="lucideCheck" class="h-4 w-4 mr-1" />Approve
+        </button>
+      </div>
+    }
+  </div>
+</div>

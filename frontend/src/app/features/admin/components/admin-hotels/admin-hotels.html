@@ -1,0 +1,80 @@
+<app-page-header title="Hotel Management" subtitle="Add and manage hotel inventory.">
+  <hlm-dialog action>
+    <button hlmDialogTrigger hlmBtn>
+      <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Hotel
+    </button>
+    <ng-template hlmDialogPortal>
+      <hlm-dialog-content>
+        <div hlmDialogHeader>
+          <h3 hlmDialogTitle>Add Hotel</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="hotel-name">Hotel Name</label>
+            <input hlmInput id="hotel-name" />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="hotel-area">Area</label>
+            <input hlmInput id="hotel-area" />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="hotel-capacity">Capacity</label>
+            <input hlmInput id="hotel-capacity" type="number" />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="hotel-rooms">Rooms</label>
+            <input hlmInput id="hotel-rooms" type="number" />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="hotel-price">Price (₹)</label>
+            <input hlmInput id="hotel-price" type="number" />
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="hotel-rating">Rating</label>
+            <input hlmInput id="hotel-rating" type="number" step="0.1" />
+          </div>
+        </div>
+        <div hlmDialogFooter>
+          <button hlmBtn>Save Hotel</button>
+        </div>
+      </hlm-dialog-content>
+    </ng-template>
+  </hlm-dialog>
+</app-page-header>
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+  @for (h of hotels; track h.id) {
+    <div hlmCard class="overflow-hidden">
+      <img [src]="h.image" alt="" class="h-40 w-full object-cover" />
+      <div hlmCardContent class="pt-4 space-y-2">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-semibold">{{ h.name }}</h3>
+            <p class="text-xs text-muted-foreground">
+              <ng-icon name="lucideMapPin" class="inline h-3 w-3" /> {{ h.area }}
+            </p>
+          </div>
+          <span class="text-xs flex items-center gap-1">
+            <ng-icon name="lucideStar" class="h-3 w-3 fill-warning text-warning" />{{ h.rating }}
+          </span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-xs text-center pt-2 border-t">
+          <div><p class="text-muted-foreground">Capacity</p><p class="font-medium">{{ h.capacity }}</p></div>
+          <div><p class="text-muted-foreground">Rooms</p><p class="font-medium">{{ h.rooms }}</p></div>
+          <div><p class="text-muted-foreground">Price</p><p class="font-medium">₹{{ h.price }}</p></div>
+        </div>
+        <div class="pt-2">
+          @if (approvedIds().has(h.id)) {
+            <app-status-badge status="Accepted" />
+          } @else {
+            <button hlmBtn size="sm" class="w-full" (click)="approve(h.id)">Approve</button>
+          }
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button hlmBtn variant="outline" size="sm" class="flex-1">Edit</button>
+          <button hlmBtn size="sm" class="flex-1">Manage</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

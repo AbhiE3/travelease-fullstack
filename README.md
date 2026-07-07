@@ -63,3 +63,16 @@ Start the backend and frontend in separate terminals (commands above). The front
 currently a static prototype (mock data, no real auth) and does not yet call the backend API —
 run it on its own for UI work, and bring up the backend separately when working on API
 integration.
+
+## Login credentials (temporary)
+
+The frontend's `/login` page has no real backend auth yet. Sign in with one of these hardcoded
+username/password pairs to reach the corresponding role dashboard:
+
+| Username   | Password      | Dashboard |
+|------------|---------------|-----------|
+| `user`     | `user123`     | Traveler |
+| `admin`    | `admin123`    | Admin |
+| `hotel`    | `hotel123`    | Hotel Partner |
+| `bus`      | `bus123`      | Transport Partner |
+| `activity` | `activity123` | Activity Provider |

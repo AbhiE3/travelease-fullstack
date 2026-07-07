@@ -5,6 +5,8 @@ import com.travelease.backend.shared.entity.BaseEntity;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -48,5 +50,6 @@ public class Trip extends BaseEntity {
     private LocalDate endDate;
 
     @Column(nullable = false, length = 30)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TripStatus status;
 }

@@ -1,0 +1,50 @@
+<app-page-header title="Booking Funnel Analytics" subtitle="Where users enter, progress, and drop off in the journey." />
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <p class="text-xs text-muted-foreground">Searches</p>
+      <p class="text-2xl font-semibold mt-1">{{ total.toLocaleString() }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <p class="text-xs text-muted-foreground">Bookings Completed</p>
+      <p class="text-2xl font-semibold mt-1">{{ completed.toLocaleString() }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <p class="text-xs text-muted-foreground">Overall Conversion</p>
+      <p class="text-2xl font-semibold mt-1">{{ conversion }}%</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <p class="text-xs text-muted-foreground">Total Drop-off</p>
+      <p class="text-2xl font-semibold mt-1">{{ totalDropOff }}%</p>
+    </div>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-6">
+  <div hlmCard class="lg:col-span-2">
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Conversion Funnel</h3>
+    </div>
+    <div hlmCardContent>
+      <app-echart [options]="funnelOptions" height="320px" />
+    </div>
+  </div>
+
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle class="flex items-center gap-2">
+        <ng-icon name="lucideTrendingDown" class="h-4 w-4 text-destructive" />Drop-off Reasons
+      </h3>
+    </div>
+    <div hlmCardContent>
+      <app-echart [options]="dropReasonsOptions" height="200px" />
+    </div>
+  </div>
+</div>

@@ -4,7 +4,20 @@
 @import 'tailwindcss/utilities.css';
 
 @import '@spartan-ng/brain/hlm-tailwind-preset.css';
+@import 'tw-animate-css';
 /* You can add global styles to this file, and also import other style files */
+
+@theme inline {
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
 
 :root {
   color-scheme: light;
@@ -13,33 +26,47 @@
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --radius: 0.75rem;
+  --background: oklch(0.985 0.005 220);
+  --foreground: oklch(0.20 0.04 230);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.20 0.04 230);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.20 0.04 230);
+  --primary: oklch(0.50 0.11 215);
+  --primary-foreground: oklch(0.99 0.005 220);
+  --secondary: oklch(0.95 0.015 220);
+  --secondary-foreground: oklch(0.25 0.05 230);
+  --muted: oklch(0.96 0.01 220);
+  --muted-foreground: oklch(0.50 0.03 230);
+  --accent: oklch(0.72 0.14 40);
+  --accent-foreground: oklch(0.99 0.005 40);
+  --destructive: oklch(0.60 0.22 25);
+  --destructive-foreground: oklch(0.99 0.005 25);
+  --success: oklch(0.65 0.15 155);
+  --success-foreground: oklch(0.99 0.005 155);
+  --warning: oklch(0.78 0.15 75);
+  --warning-foreground: oklch(0.20 0.04 75);
+  --border: oklch(0.91 0.012 220);
+  --input: oklch(0.91 0.012 220);
+  --ring: oklch(0.50 0.11 215);
+  --chart-1: oklch(0.50 0.11 215);
+  --chart-2: oklch(0.72 0.14 40);
+  --chart-3: oklch(0.65 0.15 155);
+  --chart-4: oklch(0.78 0.15 75);
+  --chart-5: oklch(0.55 0.18 290);
+  --sidebar: oklch(0.22 0.04 230);
+  --sidebar-foreground: oklch(0.92 0.01 220);
+  --sidebar-primary: oklch(0.72 0.14 40);
+  --sidebar-primary-foreground: oklch(0.99 0.005 40);
+  --sidebar-accent: oklch(0.28 0.05 230);
+  --sidebar-accent-foreground: oklch(0.98 0.005 220);
+  --sidebar-border: oklch(0.30 0.04 230);
+  --sidebar-ring: oklch(0.50 0.11 215);
+  --gradient-hero: linear-gradient(135deg, oklch(0.50 0.11 215), oklch(0.40 0.10 240));
+  --gradient-ocean: linear-gradient(180deg, oklch(0.55 0.10 215), oklch(0.42 0.10 230));
+  --shadow-card: 0 1px 3px oklch(0.20 0.04 230 / 0.06), 0 1px 2px oklch(0.20 0.04 230 / 0.04);
+  --shadow-elevated: 0 10px 30px -10px oklch(0.50 0.11 215 / 0.25);
 }
 
 :root.dark {

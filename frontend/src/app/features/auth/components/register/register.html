@@ -1,0 +1,32 @@
+<h1 class="text-2xl font-semibold tracking-tight">Create your account</h1>
+<p class="text-sm text-muted-foreground mt-1 mb-6">Start planning your first group trip in minutes.</p>
+
+<form class="space-y-4" (submit)="onSubmit($event)">
+  <div class="grid grid-cols-2 gap-3">
+    <div class="space-y-2">
+      <label hlmLabel for="name">Name</label>
+      <input hlmInput id="name" placeholder="Jane Doe" />
+    </div>
+    <div class="space-y-2">
+      <label hlmLabel for="phone">Phone</label>
+      <input hlmInput id="phone" placeholder="+91 9876543210" />
+    </div>
+  </div>
+  <div class="space-y-2">
+    <label hlmLabel for="email">Email</label>
+    <input hlmInput id="email" type="email" placeholder="you@example.com" />
+  </div>
+  <div class="space-y-2">
+    <label hlmLabel for="password">Password</label>
+    <input hlmInput id="password" type="password" placeholder="At least 8 characters" />
+  </div>
+  <div class="space-y-2">
+    <label hlmLabel for="confirm">Confirm password</label>
+    <input hlmInput id="confirm" type="password" />
+  </div>
+  <button hlmBtn type="submit" class="w-full">Create account</button>
+</form>
+
+<p class="text-sm text-muted-foreground mt-6 text-center">
+  Already have an account? <a routerLink="/login" class="text-primary font-medium">Sign in</a>
+</p>

@@ -1,0 +1,83 @@
+<app-page-header title="Route Analytics" subtitle="Performance across every booked corridor on the platform." />
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideTrendingUp" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Total Routes</p>
+      <p class="text-xl font-semibold mt-0.5">{{ totalRoutes }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideTrendingUp" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Total Bookings</p>
+      <p class="text-xl font-semibold mt-0.5">{{ totalBookings.toLocaleString() }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideWallet" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Total Revenue</p>
+      <p class="text-xl font-semibold mt-0.5">{{ totalRevenueLabel }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideClock" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Avg Cancellation</p>
+      <p class="text-xl font-semibold mt-0.5">{{ avgCancellation }}%</p>
+    </div>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6 mb-6">
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle class="flex items-center gap-2">
+        <ng-icon name="lucideTrendingUp" class="h-4 w-4 text-success" />Most Booked Routes
+      </h3>
+    </div>
+    <div hlmCardContent>
+      <app-echart [options]="topChartOptions" height="200px" />
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle class="flex items-center gap-2">
+        <ng-icon name="lucideTrendingDown" class="h-4 w-4 text-destructive" />Least Booked Routes
+      </h3>
+    </div>
+    <div hlmCardContent>
+      <app-echart [options]="bottomChartOptions" height="200px" />
+    </div>
+  </div>
+</div>
+
+<div hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>All Routes</h3>
+  </div>
+  <div hlmCardContent>
+    <div class="rounded-md border">
+      <div class="grid grid-cols-12 px-4 py-2.5 text-xs font-medium text-muted-foreground bg-muted/40 border-b">
+        <div class="col-span-4">Route</div>
+        <div class="col-span-2 text-right">Bookings</div>
+        <div class="col-span-2 text-right">Revenue</div>
+        <div class="col-span-2 text-right">Cancel %</div>
+        <div class="col-span-2 text-right">Avg Duration</div>
+      </div>
+      @for (r of rows; track r.route) {
+        <div class="grid grid-cols-12 px-4 py-3 items-center border-b last:border-0 text-sm">
+          <div class="col-span-4 font-medium">{{ r.route }}</div>
+          <div class="col-span-2 text-right tabular-nums">{{ r.bookings }}</div>
+          <div class="col-span-2 text-right tabular-nums">₹{{ r.revenue.toLocaleString() }}</div>
+          <div class="col-span-2 text-right">
+            <span hlmBadge variant="outline" [class]="r.cancellationClass">{{ r.cancellation }}%</span>
+          </div>
+          <div class="col-span-2 text-right text-muted-foreground tabular-nums">{{ r.duration }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

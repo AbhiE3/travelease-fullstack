@@ -1,0 +1,68 @@
+<div hlmCard>
+  <div hlmCardContent class="pt-5 grid md:grid-cols-5 gap-3">
+    <div class="space-y-1.5">
+      <label hlmLabel>Area</label>
+      <hlm-select [value]="'Baga Beach'">
+        <hlm-select-trigger><hlm-select-value /></hlm-select-trigger>
+        <ng-template hlmSelectPortal>
+          <hlm-select-content>
+            @for (a of areas; track a) {
+              <hlm-select-item [value]="a">{{ a }}</hlm-select-item>
+            }
+          </hlm-select-content>
+        </ng-template>
+      </hlm-select>
+    </div>
+    <div class="space-y-1.5">
+      <label hlmLabel for="budget">Budget</label>
+      <input hlmInput id="budget" value="₹3000–6000" />
+    </div>
+    <div class="space-y-1.5">
+      <label hlmLabel for="capacity">Capacity</label>
+      <input hlmInput id="capacity" value="6" />
+    </div>
+    <div class="space-y-1.5">
+      <label hlmLabel for="min-rating">Min Rating</label>
+      <input hlmInput id="min-rating" value="4.0" />
+    </div>
+    <div class="flex items-end"><button hlmBtn class="w-full">Search</button></div>
+  </div>
+</div>
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+  @for (h of hotels; track h.id; let first = $first) {
+    <div hlmCard class="overflow-hidden">
+      <div class="relative h-40">
+        <img [src]="h.image" alt="" class="h-full w-full object-cover" />
+        @if (first) {
+          <span hlmBadge class="absolute top-3 left-3 bg-accent text-accent-foreground border-0">Best Match</span>
+        }
+      </div>
+      <div hlmCardContent class="pt-4 space-y-2">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-semibold">{{ h.name }}</h3>
+            <p class="text-xs text-muted-foreground">
+              <ng-icon name="lucideMapPin" class="inline h-3 w-3" /> {{ h.area }} · {{ h.distance }}
+            </p>
+          </div>
+          <span class="text-xs flex items-center gap-1">
+            <ng-icon name="lucideStar" class="h-3 w-3 fill-warning text-warning" />{{ h.rating }}
+          </span>
+        </div>
+        <div class="flex justify-between items-center text-xs text-muted-foreground">
+          <span>Capacity {{ h.capacity }}</span><span>{{ h.rooms }} rooms left</span>
+        </div>
+        <div class="flex justify-between items-center pt-2 border-t">
+          <p class="text-lg font-semibold">
+            ₹{{ h.price }}<span class="text-xs text-muted-foreground font-normal">/night</span>
+          </p>
+          <div class="flex gap-2">
+            <button hlmBtn variant="outline" size="sm">Details</button>
+            <button hlmBtn size="sm">Select</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

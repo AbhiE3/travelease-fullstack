@@ -1,0 +1,57 @@
+<app-page-header title="Transport Partner Dashboard" subtitle="VRL Travels · 36 vehicles · 24 routes" />
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideBus" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Total Buses</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ totalBuses }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideUsers" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Seats Booked</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ seatsBooked }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucidePlane" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Upcoming Trips</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ upcomingTrips }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideWallet" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Revenue (MTD)</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ revenueMtd }}</p>
+    </div>
+  </div>
+</div>
+
+<div hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Route Occupancy</h3>
+  </div>
+  <div hlmCardContent class="space-y-4">
+    @for (r of routeOccupancy; track r.id) {
+      <div>
+        <div class="flex justify-between text-sm mb-1.5">
+          <div>
+            <span class="font-medium">{{ r.route }}</span>
+            <span class="text-xs text-muted-foreground ml-2">{{ r.departures }} departures/wk</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-muted-foreground tabular-nums">₹{{ r.revenue.toLocaleString() }}</span>
+            <span class="font-semibold tabular-nums">{{ r.occupancy }}%</span>
+          </div>
+        </div>
+        <div class="h-2.5 rounded-full bg-muted overflow-hidden">
+          <div [class]="'h-full ' + r.toneClass" [style.width.%]="r.occupancy"></div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

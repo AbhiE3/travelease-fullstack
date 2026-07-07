@@ -78,4 +78,24 @@ class AuthServiceImplTest {
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(InvalidCredentialsException.class);
     }
+
+    @Test
+    void loginReturnsProviderIdForProviderRoleUser() {
+        User provider = new User();
+        provider.setName("Provider One");
+        provider.setEmail("provider1@travelease.com");
+        provider.setPhone("9999999999");
+        provider.setPasswordHash("hashed");
+        provider.setRole(Role.ROLE_PROVIDER);
+        provider.setProviderId(1L);
+
+        when(userRepository.findByEmail("provider1@travelease.com")).thenReturn(Optional.of(provider));
+        when(passwordEncoder.matches("password", "hashed")).thenReturn(true);
+        when(jwtService.generateToken("provider1@travelease.com")).thenReturn("fake-token");
+
+        LoginResponse response = authService.login(new LoginRequest("provider1@travelease.com", "password"));
+
+        assertThat(response.user().providerId()).isEqualTo(1L);
+        assertThat(response.user().role()).isEqualTo("ROLE_PROVIDER");
+    }
 }

@@ -1,0 +1,19 @@
+<div class="grid md:grid-cols-2 gap-6">
+  @for (r of reviewCards; track r.label) {
+    <div hlmCard>
+      <div hlmCardHeader>
+        <h3 hlmCardTitle class="text-base">{{ r.label }}</h3>
+        <p class="text-xs text-muted-foreground">{{ r.sub }}</p>
+      </div>
+      <div hlmCardContent class="space-y-3">
+        <div class="flex gap-1">
+          @for (s of stars; track s) {
+            <ng-icon name="lucideStar" class="h-6 w-6 text-warning fill-warning" />
+          }
+        </div>
+        <textarea hlmTextarea class="w-full min-h-24" placeholder="Share your experience…"></textarea>
+        <button hlmBtn size="sm">Submit Review</button>
+      </div>
+    </div>
+  }
+</div>

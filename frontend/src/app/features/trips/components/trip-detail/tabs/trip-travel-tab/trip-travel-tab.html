@@ -1,0 +1,123 @@
+<div hlmCard>
+  <div hlmCardHeader><h3 hlmCardTitle>Search Buses</h3></div>
+  <div hlmCardContent>
+    <div class="grid md:grid-cols-4 gap-3">
+      <div class="space-y-1.5">
+        <label hlmLabel for="source">Source</label>
+        <input hlmInput id="source" value="Bengaluru" />
+      </div>
+      <div class="space-y-1.5">
+        <label hlmLabel for="destination">Destination</label>
+        <input hlmInput id="destination" value="Goa" />
+      </div>
+      <div class="space-y-1.5">
+        <label hlmLabel for="date">Date</label>
+        <input hlmInput id="date" type="date" value="2026-07-12" />
+      </div>
+      <div class="flex items-end"><button hlmBtn class="w-full">Search</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="space-y-3 mt-6">
+  @for (b of buses; track b.id) {
+    <div hlmCard>
+      <div hlmCardContent class="pt-5 grid md:grid-cols-12 gap-4 items-center">
+        <div class="md:col-span-4">
+          <div class="flex items-center gap-2">
+            <ng-icon name="lucideBus" class="h-4 w-4 text-primary" />
+            <h3 class="font-semibold">{{ b.name }}</h3>
+          </div>
+          <p class="text-sm text-muted-foreground">{{ b.operator }}</p>
+          @if (b.seats >= trip().members) {
+            <span hlmBadge variant="outline" class="mt-2 bg-success/15 text-success border-success/20">
+              <ng-icon name="lucideSparkles" class="h-3 w-3 mr-1" />Suitable for Group
+            </span>
+          }
+        </div>
+        <div class="md:col-span-4 flex items-center gap-3 text-sm">
+          <div>
+            <p class="font-medium tabular-nums">{{ b.departure }}</p>
+            <p class="text-xs text-muted-foreground">Bengaluru</p>
+          </div>
+          <ng-icon name="lucideArrowRight" class="h-4 w-4 text-muted-foreground" />
+          <div>
+            <p class="font-medium tabular-nums">{{ b.arrival }}</p>
+            <p class="text-xs text-muted-foreground">Goa</p>
+          </div>
+        </div>
+        <div class="md:col-span-2 text-sm">
+          <p class="text-muted-foreground text-xs">{{ b.seats }} seats left</p>
+          <p class="flex items-center gap-1 text-xs">
+            <ng-icon name="lucideStar" class="h-3 w-3 fill-warning text-warning" />{{ b.rating }}
+          </p>
+        </div>
+        <div class="md:col-span-2 flex flex-col items-end gap-2">
+          <p class="text-lg font-semibold">₹{{ b.price }}</p>
+          <div class="flex gap-2">
+            <button hlmBtn variant="outline" size="sm">View Seats</button>
+            <button hlmBtn size="sm">Select</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<div hlmCard class="mt-6">
+  <div hlmCardHeader><h3 hlmCardTitle>Seat Allocation — Volvo Multi-Axle Sleeper</h3></div>
+  <div hlmCardContent>
+    <div class="flex flex-col md:flex-row gap-6">
+      <div class="rounded-xl border bg-muted/20 p-5">
+        <p class="text-xs text-muted-foreground mb-3 text-center">Driver</p>
+        <div class="grid grid-cols-5 gap-2">
+          @for (seat of seats; track seat.index) {
+            <div
+              class="h-8 w-8 rounded-md border grid place-items-center text-[10px] font-medium"
+              [class]="
+                seat.booked
+                  ? 'bg-muted text-muted-foreground border-border'
+                  : seat.selected
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : seat.recommended
+                      ? 'bg-accent/20 border-accent text-accent'
+                      : 'bg-card border-border'
+              "
+            >
+              {{ seat.index + 1 }}
+            </div>
+          }
+        </div>
+        <div class="flex gap-4 mt-4 text-xs text-muted-foreground">
+          <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded bg-card border"></span>Available</span>
+          <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded bg-muted border"></span>Booked</span>
+          <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded bg-primary"></span>Selected</span>
+          <span class="flex items-center gap-1.5"
+            ><span class="h-3 w-3 rounded bg-accent/30 border border-accent"></span>Recommended</span
+          >
+        </div>
+      </div>
+      <div class="flex-1 space-y-3">
+        <div>
+          <p class="text-sm font-medium mb-2">Selected Seats</p>
+          <div class="flex gap-2 flex-wrap">
+            @for (s of selectedSeatLabels; track s) {
+              <span hlmBadge variant="outline" class="border-primary text-primary">Seat {{ s }}</span>
+            }
+          </div>
+        </div>
+        <div class="p-3 rounded-md bg-warning/10 flex gap-2 text-sm text-[oklch(0.40_0.12_75)]">
+          <ng-icon name="lucideAlertTriangle" class="h-4 w-4 shrink-0 mt-0.5" />
+          <span>Group may be split — only 2 adjacent pairs available. Consider Volvo at 22:00 for 6 consecutive seats.</span>
+        </div>
+        <div class="flex justify-between items-center pt-3 border-t">
+          <div>
+            <p class="text-xs text-muted-foreground">Total · 4 seats</p>
+            <p class="text-lg font-semibold">₹7,400</p>
+          </div>
+          <button hlmBtn>Proceed</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

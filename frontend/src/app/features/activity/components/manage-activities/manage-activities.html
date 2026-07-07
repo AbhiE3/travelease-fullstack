@@ -1,0 +1,28 @@
+<app-page-header title="Manage Activities" subtitle="Listings, pricing and availability.">
+  <button hlmBtn action>
+    <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Activity
+  </button>
+</app-page-header>
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+  @for (a of activities; track a.id) {
+    <div hlmCard class="overflow-hidden">
+      <img [src]="a.image" alt="" class="h-36 w-full object-cover" />
+      <div hlmCardContent class="pt-4 space-y-2">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-semibold">{{ a.name }}</h3>
+            <p class="text-xs text-muted-foreground">{{ a.destination }} · {{ a.duration }}</p>
+          </div>
+          <span class="text-xs inline-flex items-center gap-1">
+            <ng-icon name="lucideStar" class="h-3 w-3 fill-warning text-warning" />{{ a.rating }}
+          </span>
+        </div>
+        <div class="flex justify-between items-center pt-2 border-t">
+          <p class="font-semibold">₹{{ a.price.toLocaleString() }}</p>
+          <button hlmBtn size="sm" variant="outline">Edit</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,51 @@
+<app-page-header title="Activity Provider Dashboard" subtitle="Goa Watersports Co. · Baga Beach" />
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideActivity" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Activities Listed</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ activitiesListed }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideCalendarDays" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Bookings Received</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ bookingsReceived }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideUsers" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Available Slots</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ availableSlots }}</p>
+    </div>
+  </div>
+  <div hlmCard>
+    <div hlmCardContent class="pt-5">
+      <ng-icon name="lucideWallet" class="h-4 w-4 text-primary mb-2" />
+      <p class="text-xs text-muted-foreground">Revenue (MTD)</p>
+      <p class="text-xl font-semibold mt-0.5 tabular-nums">{{ revenueMtd }}</p>
+    </div>
+  </div>
+</div>
+
+<div hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Activity Occupancy</h3>
+  </div>
+  <div hlmCardContent class="space-y-4">
+    @for (o of occupancy; track o.id) {
+      <div>
+        <div class="flex justify-between text-sm mb-1.5">
+          <span class="font-medium">{{ o.name }}</span>
+          <span class="text-muted-foreground tabular-nums">{{ o.booked }} / {{ o.slots }} slots</span>
+        </div>
+        <div class="h-2.5 rounded-full bg-muted overflow-hidden">
+          <div [class]="'h-full ' + o.toneClass" [style.width.%]="o.pct"></div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

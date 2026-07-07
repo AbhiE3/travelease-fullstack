@@ -1,0 +1,104 @@
+<div class="grid lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 space-y-6">
+    <div hlmCard>
+      <div hlmCardHeader class="flex flex-row items-center justify-between">
+        <h3 hlmCardTitle>Expenses</h3>
+        <hlm-dialog>
+          <button hlmDialogTrigger hlmBtn size="sm">
+            <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Expense
+          </button>
+          <ng-template hlmDialogPortal>
+            <hlm-dialog-content>
+              <div hlmDialogHeader>
+                <h3 hlmDialogTitle>New Expense</h3>
+              </div>
+              <div class="space-y-3">
+                <div class="space-y-2">
+                  <label hlmLabel for="expense-name">Expense Name</label>
+                  <input hlmInput id="expense-name" placeholder="Water Sports" />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-2">
+                    <label hlmLabel for="expense-amount">Amount</label>
+                    <input hlmInput id="expense-amount" type="number" placeholder="3000" />
+                  </div>
+                  <div class="space-y-2">
+                    <label hlmLabel>Paid By</label>
+                    <hlm-select [value]="defaultPaidBy">
+                      <hlm-select-trigger><hlm-select-value /></hlm-select-trigger>
+                      <ng-template hlmSelectPortal>
+                        <hlm-select-content>
+                          @for (m of members; track m.id) {
+                            <hlm-select-item [value]="m.name">{{ m.name }}</hlm-select-item>
+                          }
+                        </hlm-select-content>
+                      </ng-template>
+                    </hlm-select>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label hlmLabel for="participants">Participants</label>
+                  <input hlmInput id="participants" placeholder="Raj, Arun, Sarathy" />
+                </div>
+              </div>
+              <div hlmDialogFooter>
+                <button hlmBtn>Save Expense</button>
+              </div>
+            </hlm-dialog-content>
+          </ng-template>
+        </hlm-dialog>
+      </div>
+      <div hlmCardContent class="space-y-2">
+        @for (e of expenses; track e.id) {
+          <div class="flex items-center gap-4 p-3 rounded-lg border">
+            <div class="h-10 w-10 rounded-md bg-primary/10 text-primary grid place-items-center">
+              <ng-icon name="lucideWallet" class="h-5 w-5" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium">{{ e.name }}</p>
+              <p class="text-xs text-muted-foreground">
+                Paid by {{ e.paidBy }} · split with {{ e.participants.length }}
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="font-semibold tabular-nums">₹{{ e.amount.toLocaleString() }}</p>
+              <app-status-badge [status]="e.status" />
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    <div hlmCard>
+      <div hlmCardHeader><h3 hlmCardTitle class="text-base">Settlement Summary</h3></div>
+      <div hlmCardContent class="space-y-3">
+        <div class="p-3 rounded-md bg-destructive/10">
+          <p class="text-xs text-muted-foreground">You owe</p>
+          <p class="text-xl font-semibold text-destructive">₹2,300</p>
+          <p class="text-xs">to Raj and Arun</p>
+        </div>
+        <div class="p-3 rounded-md bg-success/10">
+          <p class="text-xs text-muted-foreground">You'll receive</p>
+          <p class="text-xl font-semibold text-success">₹5,400</p>
+          <p class="text-xs">from Priya and Neha</p>
+        </div>
+      </div>
+    </div>
+    <div hlmCard>
+      <div hlmCardHeader><h3 hlmCardTitle class="text-base">Pending Settlements</h3></div>
+      <div hlmCardContent class="space-y-2">
+        @for (s of pendingSettlements; track s.from + s.to) {
+          <div class="flex items-center justify-between text-sm py-1.5">
+            <span>{{ s.from }} → {{ s.to }}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-medium tabular-nums">₹{{ s.amount }}</span>
+              <button hlmBtn size="sm" variant="outline">Mark Paid</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<app-page-header title="Invitations" subtitle="Accept or decline trips your friends invited you to." />
+
+<div class="grid md:grid-cols-2 gap-4">
+  @for (inv of invitations; track inv.id) {
+    <div hlmCard>
+      <div hlmCardContent class="pt-5">
+        <h3 class="font-semibold">{{ inv.trip }}</h3>
+        <p class="text-sm text-muted-foreground">Invited by {{ inv.organizer }}</p>
+        <div class="flex gap-3 mt-3 text-xs text-muted-foreground">
+          <span><ng-icon name="lucideCalendar" class="inline h-3 w-3 mr-1" />{{ inv.dates }}</span>
+          <span><ng-icon name="lucideUsers" class="inline h-3 w-3 mr-1" />{{ inv.members }} members</span>
+          <span><ng-icon name="lucideMapPin" class="inline h-3 w-3 mr-1" />Goa</span>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button hlmBtn class="flex-1">Accept</button>
+          <button hlmBtn variant="outline" class="flex-1">Decline</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

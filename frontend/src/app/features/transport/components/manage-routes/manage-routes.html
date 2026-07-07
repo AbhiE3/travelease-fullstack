@@ -1,0 +1,26 @@
+<app-page-header title="Manage Routes" subtitle="Active routes, departures and occupancy.">
+  <button hlmBtn action>
+    <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Route
+  </button>
+</app-page-header>
+
+<div hlmCard>
+  <div hlmCardContent class="pt-5">
+    <div class="rounded-md border">
+      <div class="grid grid-cols-12 px-4 py-2.5 text-xs font-medium text-muted-foreground bg-muted/40 border-b">
+        <div class="col-span-5">Route</div>
+        <div class="col-span-2 text-right">Departures/wk</div>
+        <div class="col-span-2 text-right">Occupancy</div>
+        <div class="col-span-3 text-right">Revenue</div>
+      </div>
+      @for (r of partnerRoutes; track r.id) {
+        <div class="grid grid-cols-12 px-4 py-3 items-center border-b last:border-0 text-sm">
+          <div class="col-span-5 font-medium">{{ r.route }}</div>
+          <div class="col-span-2 text-right tabular-nums">{{ r.departures }}</div>
+          <div class="col-span-2 text-right tabular-nums">{{ r.occupancy }}%</div>
+          <div class="col-span-3 text-right tabular-nums">₹{{ r.revenue.toLocaleString() }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
