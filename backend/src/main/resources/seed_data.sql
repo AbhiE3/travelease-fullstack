@@ -548,11 +548,95 @@ INSERT INTO booking_timeline (booking_id, event, description, occurred_at, metad
 -- 00000000..., 11111111..., 22222222..., 33333333..., aaaaaaaa..., bbbbbbbb...,
 -- cccccccc..., dddddddd...).
 -- ============================================================
+-- Hotel Provider accounts (DEV-ONLY plaintext, documented for the same reason as
+-- the transport providers above):
+--   hotelprovider1@travelease.com -> HotelProvider1@123  (providerId 101)
+--   hotelprovider2@travelease.com -> HotelProvider2@123  (providerId 102)
+-- Password hashes generated with this application's actual PasswordEncoder bean
+-- (default strength 10), same method as the rows above.
+-- ROLE_HOTEL_PROVIDER is a separate business actor from ROLE_PROVIDER (transport);
+-- its providerId tenant namespace (101/102) is intentionally disjoint from the
+-- transport providerId namespace (1/2) above - the two are never compared against
+-- each other (see SecurityUtil.resolveEffectiveHotelProviderId).
 INSERT INTO users (user_id, name, email, phone, password_hash, role, provider_id, created_at, updated_at) VALUES
 ('44444444-4444-4444-4444-444444444444', 'System Admin', 'admin@travelease.com', '9999900001', '$2a$10$PTatZMsZe.8Uq9FYlGVxEuQFlRq6IOJJWj9bb9jnCxGDDJ9TYxSFG', 'ROLE_ADMIN', NULL, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
 ('55555555-5555-5555-5555-555555555555', 'Priya Nair', 'traveler@travelease.com', '9999900002', '$2a$10$LKPljvx/NXnDyWf5ZlzEw.HOzVIo./fRTXrwGdJXkE90xJ0IEAPlC', 'ROLE_TRAVELER', NULL, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
 ('66666666-6666-6666-6666-666666666666', 'Sharma Travels Owner', 'provider1@travelease.com', '9999900003', '$2a$10$6sV0MN6YKyr1GSmVdt4SqOn.rDjIj.DbIVaqUT49nrlVpQLzDz7/O', 'ROLE_PROVIDER', 1, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
-('77777777-7777-7777-7777-777777777777', 'Metro Express Owner', 'provider2@travelease.com', '9999900004', '$2a$10$QsDEbXY9AJjVrxdVu0afZeoy5omnxvmU.5Ys56VsgA3ep.u9R4n46', 'ROLE_PROVIDER', 2, '2026-01-01 09:00:00', '2026-01-01 09:00:00');
+('77777777-7777-7777-7777-777777777777', 'Metro Express Owner', 'provider2@travelease.com', '9999900004', '$2a$10$QsDEbXY9AJjVrxdVu0afZeoy5omnxvmU.5Ys56VsgA3ep.u9R4n46', 'ROLE_PROVIDER', 2, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('e1000000-0000-0000-0000-000000000001', 'Grand Palace Hotels Owner', 'hotelprovider1@travelease.com', '9999900005', '$2a$10$IJDaiKMaNc5M1MBR28XbU.CQmw0yga.pKlJMMrbwruqbn2XqR/9JS', 'ROLE_HOTEL_PROVIDER', 101, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('e1000000-0000-0000-0000-000000000002', 'Coastal Stays Owner', 'hotelprovider2@travelease.com', '9999900006', '$2a$10$VtU3P1q94slg1MuCa4mZ5ObmdQ5V648HI.LE52ndMx6nMYj.cH306', 'ROLE_HOTEL_PROVIDER', 102, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('f1000000-0000-0000-0000-000000000001', 'Mumbai Adventures Owner', 'activityprovider1@travelease.com', '9999900007', '$2a$10$hbk0pveqX5qgbF81vFPivuAsu6W48GM85H8h.c625He3a3Aiue3PG', 'ROLE_ACTIVITY_PROVIDER', 201, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('f1000000-0000-0000-0000-000000000002', 'Goa Watersports Owner', 'activityprovider2@travelease.com', '9999900008', '$2a$10$Lw2akz9Apgz/IfVAGWdRt.tmFY9cyemWPM1DbFugcQ8sNK37KC9jW', 'ROLE_ACTIVITY_PROVIDER', 202, '2026-01-01 09:00:00', '2026-01-01 09:00:00');
+
+-- ============================================================
+-- 23. ACTIVITIES / ACTIVITY_SLOTS (Activity Provider tenant isolation)
+-- Entity columns (physical names, confirmed via INFORMATION_SCHEMA.COLUMNS -
+-- Spring Boot's default PhysicalNamingStrategy converts camelCase
+-- @Column(name=...) values to snake_case even when an explicit name is given,
+-- e.g. @Column(name="ActivityName") -> ACTIVITY_NAME, but "ActivityID" and
+-- "DestinationID" fold to ACTIVITYID/DESTINATIONID with no inserted
+-- underscore before the trailing ID):
+--   activities: activityid, provider_id, destinationid, activity_name,
+--               duration_hours, start_time, end_time, description
+--   activity_slots: activity_slot_id, activity_id, activity_date, start_time,
+--                    end_time, price, capacity, created_at, updated_at
+--
+-- Activity Provider accounts (DEV-ONLY plaintext, documented for the same
+-- reason as the transport/hotel providers above):
+--   activityprovider1@travelease.com -> ActivityProvider1@123  (providerId 201)
+--   activityprovider2@travelease.com -> ActivityProvider2@123  (providerId 202)
+-- ROLE_ACTIVITY_PROVIDER is a separate business actor from ROLE_PROVIDER
+-- (transport) and ROLE_HOTEL_PROVIDER; its providerId tenant namespace
+-- (201/202) is intentionally disjoint from both the transport namespace (1/2)
+-- and the hotel namespace (101/102) - none are ever compared against each
+-- other (see SecurityUtil.resolveEffectiveActivityProviderId).
+--
+-- One activity per Activity Provider tenant (201 / 202), each with two slots
+-- with distinguishable date/time/capacity/price, so cross-provider ownership
+-- checks have a real Provider-B resource to be denied against:
+--   Activity A (provider 201) -> Slots A1/A2
+--   Activity B (provider 202) -> Slots B1/B2
+-- ============================================================
+INSERT INTO activities (activityid, provider_id, destinationid, activity_name, duration_hours, start_time, end_time, description) VALUES
+('f2000000-0000-0000-0000-000000000001', 201, 1, 'Mumbai Heritage Walking Tour', 2.5, '09:00', '11:30', 'Guided walking tour of South Mumbai heritage sites'),
+('f2000000-0000-0000-0000-000000000002', 202, 2, 'Goa Jet Ski Experience', 1.0, '10:00', '11:00', 'Guided jet ski session along Candolim beach');
+
+INSERT INTO activity_slots (activity_slot_id, activity_id, activity_date, start_time, end_time, price, capacity, created_at, updated_at) VALUES
+('f3000000-0000-0000-0000-000000000001', 'f2000000-0000-0000-0000-000000000001', '2026-09-05', '09:00:00', '11:30:00', 800.00, 15, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('f3000000-0000-0000-0000-000000000002', 'f2000000-0000-0000-0000-000000000001', '2026-09-06', '14:00:00', '16:30:00', 900.00, 10, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('f3000000-0000-0000-0000-000000000003', 'f2000000-0000-0000-0000-000000000002', '2026-09-10', '10:00:00', '11:00:00', 1500.00, 6, '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('f3000000-0000-0000-0000-000000000004', 'f2000000-0000-0000-0000-000000000002', '2026-09-10', '12:00:00', '13:00:00', 1500.00, 6, '2026-01-01 09:00:00', '2026-01-01 09:00:00');
+
+-- ============================================================
+-- 22. HOTELS / ROOMS / HOTEL_BOOKINGS (Hotel Provider tenant isolation)
+-- Entity columns:
+--   hotels: hotel_id, provider_id, destination_id, hotel_name, address, rating,
+--           price_per_night, amenities, status, policies, created_at, updated_at
+--   rooms: room_id, hotel_id, room_type, capacity, bed_type, price_per_night,
+--          availability_status, created_at, updated_at
+--   hotel_bookings: hotel_booking_id, trip_id, hotel_id, booked_by_user_id,
+--                   check_in_date, check_out_date, room_type, room_number,
+--                   total_amount, booking_status, created_at, updated_at
+--
+-- Two hotels, one per Hotel Provider tenant (101 / 102), each with two rooms,
+-- deliberately disjoint so cross-provider ownership checks have a real
+-- Provider-B resource to be denied against:
+--   Hotel A (provider 101) -> Rooms A1/A2 -> Booking A1 (booked by traveler@travelease.com)
+--   Hotel B (provider 102) -> Rooms B1/B2 -> Booking B1 (booked by traveler@travelease.com)
+-- ============================================================
+INSERT INTO hotels (hotel_id, provider_id, destination_id, hotel_name, address, rating, price_per_night, amenities, status, policies, created_at, updated_at) VALUES
+('e2000000-0000-0000-0000-000000000001', 101, 1, 'Grand Palace Mumbai', '1 Marine Drive, Mumbai', 4.50, 6000.00, 'WiFi, Pool, Breakfast', 'ACTIVE', 'Check-in 2 PM, Check-out 11 AM', '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('e2000000-0000-0000-0000-000000000002', 102, 2, 'Coastal Stays Goa', '22 Beach Road, Goa', 4.20, 4500.00, 'WiFi, Beach Access', 'ACTIVE', 'Check-in 12 PM, Check-out 10 AM', '2026-01-01 09:00:00', '2026-01-01 09:00:00');
+
+INSERT INTO rooms (room_id, hotel_id, room_type, capacity, bed_type, price_per_night, availability_status, created_at, updated_at) VALUES
+('e3000000-0000-0000-0000-000000000001', 'e2000000-0000-0000-0000-000000000001', 'STANDARD', 2, 'QUEEN', 6000.00, 'AVAILABLE', '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('e3000000-0000-0000-0000-000000000002', 'e2000000-0000-0000-0000-000000000001', 'DELUXE', 2, 'KING', 8500.00, 'AVAILABLE', '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('e3000000-0000-0000-0000-000000000003', 'e2000000-0000-0000-0000-000000000002', 'STANDARD', 2, 'QUEEN', 4500.00, 'AVAILABLE', '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('e3000000-0000-0000-0000-000000000004', 'e2000000-0000-0000-0000-000000000002', 'DELUXE', 3, 'KING', 6200.00, 'AVAILABLE', '2026-01-01 09:00:00', '2026-01-01 09:00:00');
+
+INSERT INTO hotel_bookings (hotel_booking_id, trip_id, hotel_id, booked_by_user_id, check_in_date, check_out_date, room_type, room_number, total_amount, booking_status, created_at, updated_at) VALUES
+('e4000000-0000-0000-0000-000000000001', NULL, 'e2000000-0000-0000-0000-000000000001', '55555555-5555-5555-5555-555555555555', '2026-02-10', '2026-02-12', 'STANDARD', '101', 12000.00, 'CONFIRMED', '2026-01-01 09:00:00', '2026-01-01 09:00:00'),
+('e4000000-0000-0000-0000-000000000002', NULL, 'e2000000-0000-0000-0000-000000000002', '55555555-5555-5555-5555-555555555555', '2026-02-15', '2026-02-17', 'STANDARD', '201', 9000.00, 'CONFIRMED', '2026-01-01 09:00:00', '2026-01-01 09:00:00');
 
 -- ============================================================
 -- SEED DATA COMPLETE

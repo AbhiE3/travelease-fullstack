@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public interface HotelRepository extends JpaRepository<Hotel, UUID> {
 
+    List<Hotel> findByProviderId(Long providerId);
+
     List<Hotel> findByDestinationId(Integer destinationId);
 
     List<Hotel> findByStatusIgnoreCase(String status);

@@ -4,6 +4,8 @@ import com.travelease.backend.settlement.dto.SettlementResponse;
 import com.travelease.backend.settlement.dto.SettlementSummaryResponse;
 import com.travelease.backend.settlement.service.SettlementService;
 import com.travelease.backend.shared.dto.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,11 +19,13 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Trip Settlements", description = "Settlement recalculation and payment endpoints for trip participants")
 public class SettlementController {
 
     private final SettlementService settlementService;
 
     @GetMapping("/api/trips/{tripId}/settlements/me")
+    @Operation(summary = "Get my trip settlements", description = "ACCESS: AUTHENTICATED\nSCOPE: Accepted trip member only. Returns settlement rows where the current user participates as payer or receiver.\nIDENTITY: The current user is resolved from the JWT/email in the security context.")
     public ResponseEntity<ApiResponse<List<SettlementResponse>>> getMySettlements(
             @PathVariable UUID tripId,
             Authentication authentication
@@ -31,6 +35,7 @@ public class SettlementController {
     }
 
     @GetMapping("/api/trips/{tripId}/settlements/summary")
+    @Operation(summary = "Get trip settlement summary", description = "ACCESS: AUTHENTICATED\nSCOPE: Accepted trip member only. Recalculates and returns the trip settlement summary.\nIDENTITY: The current user is resolved from the JWT/email in the security context.")
     public ResponseEntity<ApiResponse<SettlementSummaryResponse>> getTripSettlementSummary(
             @PathVariable UUID tripId,
             Authentication authentication
@@ -40,6 +45,7 @@ public class SettlementController {
     }
 
     @PatchMapping("/api/settlements/{settlementId}/paid")
+    @Operation(summary = "Mark settlement as paid", description = "ACCESS: AUTHENTICATED\nSCOPE: Settlement participant only. The current user must be the payer or receiver of the settlement.\nIDENTITY: The current user is resolved from the JWT/email in the security context.")
     public ResponseEntity<ApiResponse<SettlementResponse>> markPaid(
             @PathVariable UUID settlementId,
             Authentication authentication

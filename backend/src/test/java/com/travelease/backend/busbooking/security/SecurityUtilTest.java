@@ -87,6 +87,122 @@ class SecurityUtilTest {
     }
 
     @Test
+    void resolveEffectiveHotelProviderIdRejectsMismatchedRequestForHotelProvider() {
+        User hotelProvider = new User();
+        hotelProvider.setEmail("hotelprovider1@travelease.com");
+        hotelProvider.setRole(Role.ROLE_HOTEL_PROVIDER);
+        hotelProvider.setProviderId(101L);
+
+        when(userRepository.findByEmail("hotelprovider1@travelease.com")).thenReturn(Optional.of(hotelProvider));
+        authenticateAs("hotelprovider1@travelease.com", "ROLE_HOTEL_PROVIDER");
+
+        assertThatThrownBy(() -> securityUtil.resolveEffectiveHotelProviderId(102L))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void resolveEffectiveHotelProviderIdReturnsOwnIdForHotelProvider() {
+        User hotelProvider = new User();
+        hotelProvider.setEmail("hotelprovider1@travelease.com");
+        hotelProvider.setRole(Role.ROLE_HOTEL_PROVIDER);
+        hotelProvider.setProviderId(101L);
+
+        when(userRepository.findByEmail("hotelprovider1@travelease.com")).thenReturn(Optional.of(hotelProvider));
+        authenticateAs("hotelprovider1@travelease.com", "ROLE_HOTEL_PROVIDER");
+
+        assertThat(securityUtil.resolveEffectiveHotelProviderId(null)).isEqualTo(101L);
+        assertThat(securityUtil.resolveEffectiveHotelProviderId(101L)).isEqualTo(101L);
+    }
+
+    @Test
+    void resolveEffectiveHotelProviderIdPassesThroughForAdmin() {
+        authenticateAs("admin@travelease.com", "ROLE_ADMIN");
+
+        assertThat(securityUtil.resolveEffectiveHotelProviderId(101L)).isEqualTo(101L);
+        assertThat(securityUtil.resolveEffectiveHotelProviderId(null)).isNull();
+    }
+
+    @Test
+    void resolveEffectiveHotelProviderIdDeniesTransportProviderRole() {
+        // A ROLE_PROVIDER (transport) account must never be treated as a generic
+        // parent provider role for Hotel Provider-scoped access.
+        authenticateAs("provider1@travelease.com", "ROLE_PROVIDER");
+
+        assertThatThrownBy(() -> securityUtil.resolveEffectiveHotelProviderId(101L))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void resolveEffectiveHotelProviderIdDeniesTraveler() {
+        authenticateAs("traveler@travelease.com", "ROLE_TRAVELER");
+
+        assertThatThrownBy(() -> securityUtil.resolveEffectiveHotelProviderId(101L))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void resolveEffectiveActivityProviderIdRejectsMismatchedRequestForActivityProvider() {
+        User activityProvider = new User();
+        activityProvider.setEmail("activityprovider1@travelease.com");
+        activityProvider.setRole(Role.ROLE_ACTIVITY_PROVIDER);
+        activityProvider.setProviderId(201L);
+
+        when(userRepository.findByEmail("activityprovider1@travelease.com")).thenReturn(Optional.of(activityProvider));
+        authenticateAs("activityprovider1@travelease.com", "ROLE_ACTIVITY_PROVIDER");
+
+        assertThatThrownBy(() -> securityUtil.resolveEffectiveActivityProviderId(202L))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void resolveEffectiveActivityProviderIdReturnsOwnIdForActivityProvider() {
+        User activityProvider = new User();
+        activityProvider.setEmail("activityprovider1@travelease.com");
+        activityProvider.setRole(Role.ROLE_ACTIVITY_PROVIDER);
+        activityProvider.setProviderId(201L);
+
+        when(userRepository.findByEmail("activityprovider1@travelease.com")).thenReturn(Optional.of(activityProvider));
+        authenticateAs("activityprovider1@travelease.com", "ROLE_ACTIVITY_PROVIDER");
+
+        assertThat(securityUtil.resolveEffectiveActivityProviderId(null)).isEqualTo(201L);
+        assertThat(securityUtil.resolveEffectiveActivityProviderId(201L)).isEqualTo(201L);
+    }
+
+    @Test
+    void resolveEffectiveActivityProviderIdPassesThroughForAdmin() {
+        authenticateAs("admin@travelease.com", "ROLE_ADMIN");
+
+        assertThat(securityUtil.resolveEffectiveActivityProviderId(201L)).isEqualTo(201L);
+        assertThat(securityUtil.resolveEffectiveActivityProviderId(null)).isNull();
+    }
+
+    @Test
+    void resolveEffectiveActivityProviderIdDeniesTransportProviderRole() {
+        authenticateAs("provider1@travelease.com", "ROLE_PROVIDER");
+
+        assertThatThrownBy(() -> securityUtil.resolveEffectiveActivityProviderId(201L))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void resolveEffectiveActivityProviderIdDeniesHotelProviderRole() {
+        // A ROLE_HOTEL_PROVIDER account must never be treated as a generic
+        // parent provider role for Activity Provider-scoped access.
+        authenticateAs("hotelprovider1@travelease.com", "ROLE_HOTEL_PROVIDER");
+
+        assertThatThrownBy(() -> securityUtil.resolveEffectiveActivityProviderId(201L))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void resolveEffectiveActivityProviderIdDeniesTraveler() {
+        authenticateAs("traveler@travelease.com", "ROLE_TRAVELER");
+
+        assertThatThrownBy(() -> securityUtil.resolveEffectiveActivityProviderId(201L))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
     void getCurrentUserIdThrowsWhenEmailNotFound() {
         when(userRepository.findByEmail("ghost@travelease.com")).thenReturn(Optional.empty());
         authenticateAs("ghost@travelease.com", "ROLE_TRAVELER");

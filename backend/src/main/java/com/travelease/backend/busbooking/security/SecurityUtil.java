@@ -74,6 +74,71 @@ public class SecurityUtil {
         throw new AccessDeniedException("Insufficient privileges for provider-scoped access");
     }
 
+    /**
+     * Hotel Provider equivalent of {@link #resolveEffectiveProviderId(Long)}. Kept
+     * as a distinct, explicitly-named method rather than folding ROLE_HOTEL_PROVIDER
+     * into the transport method above: ROLE_PROVIDER and ROLE_HOTEL_PROVIDER are
+     * separate business actors, and a single generalized "any provider role" check
+     * would let a transport provider's request satisfy a hotel-scoped check (or vice
+     * versa) merely because both roles share the same providerId column on User.
+     *
+     * - ROLE_HOTEL_PROVIDER: always forced to the authenticated hotel provider's own
+     *   id. A client-supplied requestedProviderId that conflicts with it is rejected
+     *   (403) rather than silently overridden.
+     * - ROLE_ADMIN: the client-supplied id is used as-is (may be null).
+     * - Any other role (including ROLE_PROVIDER): denied.
+     */
+    public Long resolveEffectiveHotelProviderId(Long requestedProviderId) {
+        Set<String> roles = getCurrentUserRoles();
+
+        if (roles.contains("ROLE_HOTEL_PROVIDER")) {
+            Long ownProviderId = getCurrentProviderId();
+            if (requestedProviderId != null && !requestedProviderId.equals(ownProviderId)) {
+                throw new AccessDeniedException("Hotel providers may only access their own providerId");
+            }
+            return ownProviderId;
+        }
+
+        if (roles.contains("ROLE_ADMIN")) {
+            return requestedProviderId;
+        }
+
+        throw new AccessDeniedException("Insufficient privileges for hotel-provider-scoped access");
+    }
+
+    /**
+     * Activity Provider equivalent of {@link #resolveEffectiveProviderId(Long)} /
+     * {@link #resolveEffectiveHotelProviderId(Long)}. Kept as a third, distinct,
+     * explicitly-named method rather than a generalized "any provider role"
+     * resolver - Bus Provider, Hotel Provider, and Activity Provider are separate
+     * business actors, and a single generic method would let any one of them
+     * satisfy another's tenant-scoped check merely because all three share the
+     * same providerId column shape on User.
+     *
+     * - ROLE_ACTIVITY_PROVIDER: always forced to the authenticated activity
+     *   provider's own id. A client-supplied requestedProviderId that conflicts
+     *   with it is rejected (403) rather than silently overridden.
+     * - ROLE_ADMIN: the client-supplied id is used as-is (may be null).
+     * - Any other role (including ROLE_PROVIDER, ROLE_HOTEL_PROVIDER): denied.
+     */
+    public Long resolveEffectiveActivityProviderId(Long requestedProviderId) {
+        Set<String> roles = getCurrentUserRoles();
+
+        if (roles.contains("ROLE_ACTIVITY_PROVIDER")) {
+            Long ownProviderId = getCurrentProviderId();
+            if (requestedProviderId != null && !requestedProviderId.equals(ownProviderId)) {
+                throw new AccessDeniedException("Activity providers may only access their own providerId");
+            }
+            return ownProviderId;
+        }
+
+        if (roles.contains("ROLE_ADMIN")) {
+            return requestedProviderId;
+        }
+
+        throw new AccessDeniedException("Insufficient privileges for activity-provider-scoped access");
+    }
+
     private User getCurrentUser() {
         Authentication authentication = getAuthentication();
         String email = authentication.getName();

@@ -1,12 +1,15 @@
 package com.travelease.backend.shared.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelease.backend.security.JwtAuthFilter;
+import com.travelease.backend.shared.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,6 +32,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final ObjectMapper objectMapper;
 
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
@@ -69,8 +73,20 @@ public class SecurityConfig {
                     auth.anyRequest().authenticated();
                 })
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(
-                        (request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+                        // Written directly in the app's own ApiResponse/ApiError shape rather
+                        // than response.sendError(...): sendError delegates to Spring Boot's
+                        // default /error handling, whose JSON body (timestamp/status/error/
+                        // message/path, with "error" as a plain String) does not deserialize
+                        // as ApiResponse (whose "error" component is the ApiError object) -
+                        // every other 4xx/5xx path in this API goes through
+                        // GlobalExceptionHandler and returns ApiResponse, so the pre-
+                        // authentication case is made consistent with that same contract.
+                        (request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.getWriter().write(objectMapper.writeValueAsString(
+                                    ApiResponse.error("UNAUTHORIZED", "Authentication is required to access this resource")));
+                        }
                 ))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

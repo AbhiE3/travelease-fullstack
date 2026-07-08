@@ -1,5 +1,6 @@
 package com.travelease.backend.busbooking.service;
 
+import com.travelease.backend.busbooking.dto.request.AttachBusBookingRequest;
 import com.travelease.backend.busbooking.dto.request.BookingModificationRequest;
 import com.travelease.backend.busbooking.dto.request.BookingRequest;
 import com.travelease.backend.busbooking.dto.request.CancellationRequest;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface BookingService {
 
@@ -40,4 +42,10 @@ public interface BookingService {
     // Phase 7 Ã¢â‚¬â€œ Enhanced Cancellation (unified)
     CancellationResponse cancelBookingUnified(Long bookingId, CancellationRequest request);
     CancellationResponse partialCancelBooking(PartialCancellationRequest request);
+
+    // Traveler Trip integration - attach/detach/list only; booking lifecycle
+    // (create/confirm/cancel/ticket) is intentionally untouched by this feature.
+    TripBusBookingResponse attachBookingToTrip(UUID tripId, AttachBusBookingRequest request);
+    void removeBookingFromTrip(UUID tripId, Long bookingId);
+    TripBusBookingSummaryResponse getTripBusBookings(UUID tripId);
 }

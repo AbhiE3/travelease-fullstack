@@ -24,11 +24,15 @@ import com.travelease.backend.accommodation.repository.HotelBookingRepository;
 import com.travelease.backend.accommodation.repository.HotelRepository;
 import com.travelease.backend.accommodation.repository.HotelReviewRepository;
 import com.travelease.backend.accommodation.repository.RoomRepository;
+import com.travelease.backend.auth.entity.Role;
 import com.travelease.backend.auth.entity.User;
 import com.travelease.backend.auth.repository.UserRepository;
+import com.travelease.backend.busbooking.security.SecurityUtil;
 import com.travelease.backend.shared.exception.InvalidRequestException;
 import com.travelease.backend.shared.exception.ResourceNotFoundException;
+import com.travelease.backend.trip.entity.Trip;
 import com.travelease.backend.trip.repository.TripRepository;
+import com.travelease.backend.trip.security.TripAuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -58,6 +62,8 @@ public class AccommodationServiceImpl implements AccommodationService {
     private final HotelReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final TripRepository tripRepository;
+    private final TripAuthorizationService tripAuthorizationService;
+    private final SecurityUtil securityUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -78,8 +84,19 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Override
     @Transactional(readOnly = true)
     public HotelDetailsResponse getHotelDetails(UUID hotelId) {
+        return buildHotelDetailsResponse(getHotel(hotelId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public HotelDetailsResponse getProviderHotelDetails(UUID hotelId) {
         Hotel hotel = getHotel(hotelId);
-        List<RoomResponse> rooms = roomRepository.findByHotelId(hotelId).stream().map(this::toRoomResponse).toList();
+        assertOwnsHotel(hotel);
+        return buildHotelDetailsResponse(hotel);
+    }
+
+    private HotelDetailsResponse buildHotelDetailsResponse(Hotel hotel) {
+        List<RoomResponse> rooms = roomRepository.findByHotelId(hotel.getId()).stream().map(this::toRoomResponse).toList();
         String suggestion = rooms.stream().anyMatch(room -> AVAILABLE.equalsIgnoreCase(room.availabilityStatus()))
                 ? "Rooms are available for this hotel"
                 : "No available rooms right now";
@@ -89,21 +106,31 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Override
     @Transactional
     public HotelResponse createHotel(HotelRequest request) {
+        Long effectiveProviderId = securityUtil.resolveEffectiveHotelProviderId(request.providerId());
+        if (effectiveProviderId == null) {
+            throw new InvalidRequestException("providerId is required to create a hotel");
+        }
         Hotel hotel = new Hotel();
+        hotel.setProviderId(effectiveProviderId);
         applyHotelRequest(hotel, request);
         return toHotelResponse(hotelRepository.save(hotel));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<HotelResponse> getProviderHotels() {
-        return hotelRepository.findAll().stream().map(this::toHotelResponse).toList();
+    public List<HotelResponse> getProviderHotels(Long providerId) {
+        Long effectiveProviderId = securityUtil.resolveEffectiveHotelProviderId(providerId);
+        List<Hotel> hotels = effectiveProviderId != null
+                ? hotelRepository.findByProviderId(effectiveProviderId)
+                : hotelRepository.findAll();
+        return hotels.stream().map(this::toHotelResponse).toList();
     }
 
     @Override
     @Transactional
     public HotelResponse updateHotel(UUID hotelId, HotelRequest request) {
         Hotel hotel = getHotel(hotelId);
+        assertOwnsHotel(hotel);
         applyHotelRequest(hotel, request);
         return toHotelResponse(hotelRepository.save(hotel));
     }
@@ -112,6 +139,7 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Transactional
     public HotelResponse updatePolicies(UUID hotelId, HotelPolicyRequest request) {
         Hotel hotel = getHotel(hotelId);
+        assertOwnsHotel(hotel);
         hotel.setPolicies(request.policies());
         return toHotelResponse(hotelRepository.save(hotel));
     }
@@ -119,8 +147,10 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Override
     @Transactional
     public RoomResponse createRoom(UUID hotelId, RoomRequest request) {
+        Hotel hotel = getHotel(hotelId);
+        assertOwnsHotel(hotel);
         Room room = new Room();
-        room.setHotel(getHotel(hotelId));
+        room.setHotel(hotel);
         applyRoomRequest(room, request);
         return toRoomResponse(roomRepository.save(room));
     }
@@ -128,14 +158,16 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Override
     @Transactional(readOnly = true)
     public List<RoomResponse> getRooms(UUID hotelId) {
-        ensureHotelExists(hotelId);
+        Hotel hotel = getHotel(hotelId);
+        assertOwnsHotel(hotel);
         return roomRepository.findByHotelId(hotelId).stream().map(this::toRoomResponse).toList();
     }
 
     @Override
     @Transactional
     public RoomResponse updateRoom(UUID hotelId, UUID roomId, RoomRequest request) {
-        ensureHotelExists(hotelId);
+        Hotel hotel = getHotel(hotelId);
+        assertOwnsHotel(hotel);
         Room room = getRoom(roomId);
         if (!room.getHotel().getId().equals(hotelId)) {
             throw new InvalidRequestException("Room does not belong to hotel " + hotelId);
@@ -148,6 +180,7 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Transactional
     public RoomResponse updateAvailability(UUID roomId, RoomAvailabilityRequest request) {
         Room room = getRoom(roomId);
+        assertOwnsHotel(room.getHotel());
         room.setAvailabilityStatus(request.availabilityStatus());
         return toRoomResponse(roomRepository.save(room));
     }
@@ -156,14 +189,19 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Transactional
     public RoomResponse blockMaintenance(UUID roomId) {
         Room room = getRoom(roomId);
+        assertOwnsHotel(room.getHotel());
         room.setAvailabilityStatus(MAINTENANCE);
         return toRoomResponse(roomRepository.save(room));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<RoomResponse> getInventory() {
-        return roomRepository.findAll().stream().map(this::toRoomResponse).toList();
+    public List<RoomResponse> getInventory(Long providerId) {
+        Long effectiveProviderId = securityUtil.resolveEffectiveHotelProviderId(providerId);
+        List<Room> rooms = effectiveProviderId != null
+                ? roomRepository.findByHotel_ProviderId(effectiveProviderId)
+                : roomRepository.findAll();
+        return rooms.stream().map(this::toRoomResponse).toList();
     }
 
     @Override
@@ -213,15 +251,18 @@ public class AccommodationServiceImpl implements AccommodationService {
 
     @Override
     @Transactional(readOnly = true)
-    public HotelBookingResponse getBooking(UUID bookingId) {
-        return toBookingResponse(getBookingEntity(bookingId));
+    public HotelBookingResponse getBooking(UUID bookingId, String currentUserEmail) {
+        HotelBooking booking = getBookingEntity(bookingId);
+        ensureBookingOwner(booking, currentUserEmail);
+        return toBookingResponse(booking);
     }
 
     @Override
     @Transactional
-    public HotelBookingResponse updateBooking(UUID bookingId, HotelBookingRequest request) {
-        BookingQuoteResponse quote = quoteBooking(request);
+    public HotelBookingResponse updateBooking(UUID bookingId, HotelBookingRequest request, String currentUserEmail) {
         HotelBooking booking = getBookingEntity(bookingId);
+        ensureBookingOwner(booking, currentUserEmail);
+        BookingQuoteResponse quote = quoteBooking(request);
         booking.setTripId(request.tripId());
         booking.setHotel(getHotel(request.hotelId()));
         booking.setCheckInDate(request.checkInDate());
@@ -234,8 +275,9 @@ public class AccommodationServiceImpl implements AccommodationService {
 
     @Override
     @Transactional
-    public HotelBookingResponse cancelBooking(UUID bookingId) {
+    public HotelBookingResponse cancelBooking(UUID bookingId, String currentUserEmail) {
         HotelBooking booking = getBookingEntity(bookingId);
+        ensureBookingOwner(booking, currentUserEmail);
         booking.setBookingStatus(CANCELLED);
         return toBookingResponse(bookingRepository.save(booking));
     }
@@ -248,8 +290,9 @@ public class AccommodationServiceImpl implements AccommodationService {
 
     @Override
     @Transactional(readOnly = true)
-    public HotelBillResponse getBill(UUID bookingId) {
+    public HotelBillResponse getBill(UUID bookingId, String currentUserEmail) {
         HotelBooking booking = getBookingEntity(bookingId);
+        ensureBookingOwner(booking, currentUserEmail);
         return new HotelBillResponse(
                 booking.getId(),
                 booking.getHotel().getHotelName(),
@@ -264,28 +307,57 @@ public class AccommodationServiceImpl implements AccommodationService {
 
     @Override
     @Transactional
-    public HotelBookingResponse attachBookingToTrip(UUID tripId, AttachHotelBookingRequest request) {
-        ensureTripExists(tripId);
+    public HotelBookingResponse attachBookingToTrip(UUID tripId, AttachHotelBookingRequest request, String currentUserEmail) {
+        Trip trip = getTrip(tripId);
+        User currentUser = getCurrentUser(currentUserEmail);
+        tripAuthorizationService.requireMember(trip, currentUser.getId(), isAdmin(currentUser));
+        tripAuthorizationService.requireMutableTrip(trip);
+
+        // Trip access alone is not enough: the caller must also own the
+        // HotelBooking being attached, otherwise an accepted member could attach
+        // another traveler's private booking merely by knowing its id.
         HotelBooking booking = getBookingEntity(request.bookingId());
+        ensureBookingOwner(booking, currentUserEmail);
+
         booking.setTripId(tripId);
         return toBookingResponse(bookingRepository.save(booking));
     }
 
     @Override
     @Transactional
-    public void removeBookingFromTrip(UUID tripId, UUID bookingId) {
+    public void removeBookingFromTrip(UUID tripId, UUID bookingId, String currentUserEmail) {
+        Trip trip = getTrip(tripId);
+        User currentUser = getCurrentUser(currentUserEmail);
+        tripAuthorizationService.requireMember(trip, currentUser.getId(), isAdmin(currentUser));
+        tripAuthorizationService.requireMutableTrip(trip);
+
         HotelBooking booking = getBookingEntity(bookingId);
         if (!tripId.equals(booking.getTripId())) {
             throw new InvalidRequestException("Booking is not attached to trip " + tripId);
         }
+
+        // Either the trip organizer (trip-level authority) or the booking's own
+        // owner may detach it - a fellow accepted member with neither role may
+        // not remove another traveler's private booking from the shared trip.
+        boolean isOrganizer = tripAuthorizationService.isOrganizer(trip, currentUser.getId());
+        boolean isBookingOwner = booking.getBookedBy() != null
+                && Objects.equals(booking.getBookedBy().getEmail(), currentUserEmail);
+        if (!isOrganizer && !isBookingOwner) {
+            throw new AccessDeniedException(
+                    "Only the trip organizer or the booking's owner may remove this accommodation attachment");
+        }
+
         booking.setTripId(null);
         bookingRepository.save(booking);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AccommodationSummaryResponse getAccommodationSummary(UUID tripId) {
-        ensureTripExists(tripId);
+    public AccommodationSummaryResponse getAccommodationSummary(UUID tripId, String currentUserEmail) {
+        Trip trip = getTrip(tripId);
+        User currentUser = getCurrentUser(currentUserEmail);
+        tripAuthorizationService.requireMember(trip, currentUser.getId(), isAdmin(currentUser));
+
         List<HotelBookingResponse> bookings = bookingRepository.findByTripId(tripId)
                 .stream()
                 .map(this::toBookingResponse)
@@ -336,6 +408,7 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Transactional
     public HotelBookingResponse checkIn(UUID bookingId) {
         HotelBooking booking = getBookingEntity(bookingId);
+        assertOwnsHotel(booking.getHotel());
         booking.setBookingStatus(CHECKED_IN);
         return toBookingResponse(bookingRepository.save(booking));
     }
@@ -344,6 +417,7 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Transactional
     public HotelBookingResponse checkOut(UUID bookingId) {
         HotelBooking booking = getBookingEntity(bookingId);
+        assertOwnsHotel(booking.getHotel());
         booking.setBookingStatus(CHECKED_OUT);
         return toBookingResponse(bookingRepository.save(booking));
     }
@@ -430,15 +504,36 @@ public class AccommodationServiceImpl implements AccommodationService {
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " not found"));
     }
 
-    private void ensureTripExists(UUID tripId) {
-        if (!tripRepository.existsById(tripId)) {
-            throw new ResourceNotFoundException("Trip with id " + tripId + " not found");
-        }
+    private Trip getTrip(UUID tripId) {
+        return tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip with id " + tripId + " not found"));
+    }
+
+    private boolean isAdmin(User user) {
+        return user.getRole() == Role.ROLE_ADMIN;
+    }
+
+    /**
+     * Role gate ("is this caller a Hotel Provider/Admin?") is enforced declaratively
+     * via @PreAuthorize on ProviderAccommodationController. This asserts the second,
+     * required axis: "does this Hotel Provider own this Hotel resource?" - a
+     * ROLE_HOTEL_PROVIDER caller whose own providerId does not match the hotel's is
+     * rejected; ROLE_ADMIN passes through unrestricted, matching the existing Bus
+     * SecurityUtil.resolveEffectiveProviderId/assertOwnsBus convention.
+     */
+    private void assertOwnsHotel(Hotel hotel) {
+        securityUtil.resolveEffectiveHotelProviderId(hotel.getProviderId());
     }
 
     private void ensureReviewOwner(HotelReview review, String email) {
         if (!Objects.equals(review.getUser().getEmail(), email)) {
             throw new AccessDeniedException("Current user does not own this review");
+        }
+    }
+
+    private void ensureBookingOwner(HotelBooking booking, String email) {
+        if (booking.getBookedBy() == null || !Objects.equals(booking.getBookedBy().getEmail(), email)) {
+            throw new AccessDeniedException("Current user does not own this hotel booking");
         }
     }
 

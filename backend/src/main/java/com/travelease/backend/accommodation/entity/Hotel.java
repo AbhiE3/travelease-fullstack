@@ -17,6 +17,14 @@ import java.math.BigDecimal;
 @Table(name = "hotels")
 public class Hotel extends BaseEntity {
 
+    /**
+     * The Hotel Provider tenant that owns this hotel. Assigned server-side from
+     * the authenticated ROLE_HOTEL_PROVIDER account (or explicitly by ROLE_ADMIN)
+     * at creation time; never accepted as client-authoritative on update.
+     */
+    @Column(name = "provider_id", nullable = false)
+    private Long providerId;
+
     @Column(name = "destination_id", nullable = false)
     private Integer destinationId;
 

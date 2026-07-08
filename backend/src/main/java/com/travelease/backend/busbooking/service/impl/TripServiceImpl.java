@@ -14,6 +14,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,11 +50,22 @@ public class TripServiceImpl implements TripService {
             throw new IllegalStateException("Bus is not available for trip assignment");
         }
 
+        // The provider that this assignment must be internally consistent with -
+        // derived from the schedule's own bus, not from the caller. This keeps a
+        // ROLE_PROVIDER caller confined to their own driver/conductor (since the
+        // controller already asserted they own this schedule) and, just as
+        // importantly, stops ROLE_ADMIN from creating a mixed assignment across
+        // providers even though admin can reach any individual resource.
+        Long scheduleProviderId = bus.getProviderId();
+
         Driver driver = null;
         if (request.getDriverId() != null) {
             driver = driverRepository.findById(request.getDriverId())
                     .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: " + request.getDriverId()));
 
+            if (!driver.getProviderId().equals(scheduleProviderId)) {
+                throw new AccessDeniedException("Driver does not belong to the schedule's provider");
+            }
             if (driver.getStatus() != DriverStatus.AVAILABLE) {
                 throw new IllegalStateException("Driver is not available");
             }
@@ -67,6 +79,9 @@ public class TripServiceImpl implements TripService {
             conductor = conductorRepository.findById(request.getConductorId())
                     .orElseThrow(() -> new ResourceNotFoundException("Conductor not found with id: " + request.getConductorId()));
 
+            if (!conductor.getProviderId().equals(scheduleProviderId)) {
+                throw new AccessDeniedException("Conductor does not belong to the schedule's provider");
+            }
             if (conductor.getStatus() != ConductorStatus.AVAILABLE) {
                 throw new IllegalStateException("Conductor is not available");
             }

@@ -13,8 +13,10 @@ import com.travelease.backend.shared.exception.InvalidRequestException;
 import com.travelease.backend.shared.exception.ResourceNotFoundException;
 import com.travelease.backend.trip.entity.Trip;
 import com.travelease.backend.trip.entity.TripMember;
+import com.travelease.backend.trip.entity.TripMemberStatus;
 import com.travelease.backend.trip.repository.TripMemberRepository;
 import com.travelease.backend.trip.repository.TripRepository;
+import com.travelease.backend.trip.security.TripAuthorizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -43,22 +45,25 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final TripMemberRepository tripMemberRepository;
     private final UserRepository userRepository;
     private final ExpenseMapper expenseMapper;
+    private final TripAuthorizationService tripAuthorizationService;
 
     @Override
     @Transactional
     public ExpenseResponse createSharedExpense(UUID tripId, CreateExpenseRequest request, String currentUserEmail) {
         Trip trip = findTrip(tripId);
         ensureCurrentUserIsMember(tripId, currentUserEmail);
+        tripAuthorizationService.requireMutableTrip(trip);
 
         Set<UUID> participantIds = new LinkedHashSet<>(request.participantIds());
         if (participantIds.isEmpty()) {
             throw new InvalidRequestException("At least one participant is required");
         }
-        if (!tripMemberRepository.existsByTripIdAndUserId(tripId, request.payerId())) {
+        if (!tripMemberRepository.existsByTripIdAndUserIdAndMemberStatus(tripId, request.payerId(), TripMemberStatus.ACCEPTED)) {
             throw new InvalidRequestException("Payer must be a trip member");
         }
 
-        List<TripMember> participantMembers = tripMemberRepository.findByTripIdAndUserIdIn(tripId, participantIds);
+        List<TripMember> participantMembers = tripMemberRepository.findByTripIdAndUserIdInAndMemberStatus(
+                tripId, participantIds, TripMemberStatus.ACCEPTED);
         if (participantMembers.size() != participantIds.size()) {
             throw new InvalidRequestException("All participants must be trip members");
         }
@@ -128,7 +133,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private void ensureCurrentUserIsMember(UUID tripId, String email) {
-        if (!tripMemberRepository.existsByTripIdAndUserEmail(tripId, email)) {
+        if (!tripMemberRepository.existsByTripIdAndUserEmailAndMemberStatus(tripId, email, TripMemberStatus.ACCEPTED)) {
             throw new AccessDeniedException("Current user is not a member of this trip");
         }
     }

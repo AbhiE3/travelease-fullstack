@@ -21,6 +21,11 @@ public interface RefundRepository extends JpaRepository<Refund, Long>, JpaSpecif
 
     List<Refund> findByBookingUserIdOrderByInitiatedAtDesc(UUID userId);
 
+    // Fix: refund reports previously loaded the entire refund table (findAll())
+    // with no provider scoping at all. This filters at the database level via
+    // Refund -> Booking -> Schedule -> Bus -> providerId.
+    List<Refund> findByBooking_Schedule_Bus_ProviderId(Long providerId);
+
     @Query("SELECT COUNT(r) FROM Refund r WHERE r.status = :status")
     Long countByStatus(@Param("status") RefundStatus status);
 

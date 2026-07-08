@@ -326,7 +326,12 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportResponse generateMaintenanceReport(ReportFilterRequest filters) {
-        List<Maintenance> maintenanceList = maintenanceRepository.findAll();
+        // Provider-scoped first (when present) so a busId filter on top can never
+        // surface another provider's bus - the busId simply won't match anything
+        // in an already provider-scoped list.
+        List<Maintenance> maintenanceList = filters.getProviderId() != null
+                ? maintenanceRepository.findByProviderId(filters.getProviderId())
+                : maintenanceRepository.findAll();
         if (filters.getBusId() != null) {
             maintenanceList = maintenanceList.stream()
                     .filter(m -> m.getBus().getId().equals(filters.getBusId()))
@@ -364,7 +369,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportResponse generateRefundReport(ReportFilterRequest filters) {
-        List<Refund> refunds = refundRepository.findAll();
+        List<Refund> refunds = filters.getProviderId() != null
+                ? refundRepository.findByBooking_Schedule_Bus_ProviderId(filters.getProviderId())
+                : refundRepository.findAll();
 
         List<Map<String, Object>> data = refunds.stream()
                 .map(r -> {

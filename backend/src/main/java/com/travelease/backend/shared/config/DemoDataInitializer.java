@@ -17,6 +17,7 @@ import com.travelease.backend.settlement.entity.Settlement;
 import com.travelease.backend.settlement.entity.SettlementStatus;
 import com.travelease.backend.settlement.repository.SettlementRepository;
 import com.travelease.backend.trip.entity.Trip;
+import com.travelease.backend.trip.entity.TravelerTripStatus;
 import com.travelease.backend.trip.entity.TripMember;
 import com.travelease.backend.trip.entity.TripMemberStatus;
 import com.travelease.backend.trip.repository.TripMemberRepository;
@@ -87,7 +88,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         trip.setCategoryId(1);
         trip.setStartDate(LocalDate.now().plusDays(10));
         trip.setEndDate(LocalDate.now().plusDays(14));
-        trip.setStatus("PLANNED");
+        trip.setStatus(TravelerTripStatus.PLANNING);
         trip = tripRepository.save(trip);
 
         addTripMember(trip, alice, "1000.00", "100.00");

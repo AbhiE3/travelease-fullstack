@@ -54,29 +54,39 @@ public class HotelBookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<ApiResponse<HotelBookingResponse>> getBooking(@PathVariable UUID bookingId) {
-        HotelBookingResponse response = accommodationService.getBooking(bookingId);
+    public ResponseEntity<ApiResponse<HotelBookingResponse>> getBooking(
+            @PathVariable UUID bookingId,
+            Authentication authentication
+    ) {
+        HotelBookingResponse response = accommodationService.getBooking(bookingId, authentication.getName());
         return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking retrieved"));
     }
 
     @PutMapping("/{bookingId}")
     public ResponseEntity<ApiResponse<HotelBookingResponse>> update(
             @PathVariable UUID bookingId,
-            @Valid @RequestBody HotelBookingRequest request
+            @Valid @RequestBody HotelBookingRequest request,
+            Authentication authentication
     ) {
-        HotelBookingResponse response = accommodationService.updateBooking(bookingId, request);
+        HotelBookingResponse response = accommodationService.updateBooking(bookingId, request, authentication.getName());
         return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking updated"));
     }
 
     @PutMapping("/{bookingId}/cancel")
-    public ResponseEntity<ApiResponse<HotelBookingResponse>> cancel(@PathVariable UUID bookingId) {
-        HotelBookingResponse response = accommodationService.cancelBooking(bookingId);
+    public ResponseEntity<ApiResponse<HotelBookingResponse>> cancel(
+            @PathVariable UUID bookingId,
+            Authentication authentication
+    ) {
+        HotelBookingResponse response = accommodationService.cancelBooking(bookingId, authentication.getName());
         return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking cancelled"));
     }
 
     @GetMapping("/{bookingId}/bill")
-    public ResponseEntity<ApiResponse<HotelBillResponse>> bill(@PathVariable UUID bookingId) {
-        HotelBillResponse response = accommodationService.getBill(bookingId);
+    public ResponseEntity<ApiResponse<HotelBillResponse>> bill(
+            @PathVariable UUID bookingId,
+            Authentication authentication
+    ) {
+        HotelBillResponse response = accommodationService.getBill(bookingId, authentication.getName());
         return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking bill retrieved"));
     }
 }

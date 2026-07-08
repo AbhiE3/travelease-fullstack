@@ -14,12 +14,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -33,24 +35,30 @@ public class ProviderAccommodationController {
     private final AccommodationService accommodationService;
 
     @PostMapping("/hotels")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<HotelResponse>> createHotel(@Valid @RequestBody HotelRequest request) {
         HotelResponse response = accommodationService.createHotel(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Hotel created"));
     }
 
     @GetMapping("/hotels")
-    public ResponseEntity<ApiResponse<List<HotelResponse>>> hotels() {
-        List<HotelResponse> response = accommodationService.getProviderHotels();
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
+    public ResponseEntity<ApiResponse<List<HotelResponse>>> hotels(
+            @RequestParam(required = false) Long providerId
+    ) {
+        List<HotelResponse> response = accommodationService.getProviderHotels(providerId);
         return ResponseEntity.ok(ApiResponse.success(response, "Provider hotels retrieved"));
     }
 
     @GetMapping("/hotels/{hotelId}")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<HotelDetailsResponse>> hotelDetails(@PathVariable UUID hotelId) {
-        HotelDetailsResponse response = accommodationService.getHotelDetails(hotelId);
+        HotelDetailsResponse response = accommodationService.getProviderHotelDetails(hotelId);
         return ResponseEntity.ok(ApiResponse.success(response, "Provider hotel details retrieved"));
     }
 
     @PutMapping("/hotels/{hotelId}")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<HotelResponse>> updateHotel(
             @PathVariable UUID hotelId,
             @Valid @RequestBody HotelRequest request
@@ -60,6 +68,7 @@ public class ProviderAccommodationController {
     }
 
     @PostMapping("/hotels/{hotelId}/rooms")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<RoomResponse>> createRoom(
             @PathVariable UUID hotelId,
             @Valid @RequestBody RoomRequest request
@@ -69,12 +78,14 @@ public class ProviderAccommodationController {
     }
 
     @GetMapping("/hotels/{hotelId}/rooms")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<List<RoomResponse>>> rooms(@PathVariable UUID hotelId) {
         List<RoomResponse> response = accommodationService.getRooms(hotelId);
         return ResponseEntity.ok(ApiResponse.success(response, "Rooms retrieved"));
     }
 
     @PutMapping("/hotels/{hotelId}/rooms/{roomId}")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<RoomResponse>> updateRoom(
             @PathVariable UUID hotelId,
             @PathVariable UUID roomId,
@@ -85,6 +96,7 @@ public class ProviderAccommodationController {
     }
 
     @PutMapping("/rooms/{roomId}/availability")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<RoomResponse>> updateAvailability(
             @PathVariable UUID roomId,
             @Valid @RequestBody RoomAvailabilityRequest request
@@ -94,18 +106,23 @@ public class ProviderAccommodationController {
     }
 
     @PutMapping("/rooms/{roomId}/maintenance")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<RoomResponse>> maintenance(@PathVariable UUID roomId) {
         RoomResponse response = accommodationService.blockMaintenance(roomId);
         return ResponseEntity.ok(ApiResponse.success(response, "Room blocked for maintenance"));
     }
 
     @GetMapping("/inventory")
-    public ResponseEntity<ApiResponse<List<RoomResponse>>> inventory() {
-        List<RoomResponse> response = accommodationService.getInventory();
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
+    public ResponseEntity<ApiResponse<List<RoomResponse>>> inventory(
+            @RequestParam(required = false) Long providerId
+    ) {
+        List<RoomResponse> response = accommodationService.getInventory(providerId);
         return ResponseEntity.ok(ApiResponse.success(response, "Inventory calendar retrieved"));
     }
 
     @PutMapping("/hotels/{hotelId}/policies")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<HotelResponse>> updatePolicies(
             @PathVariable UUID hotelId,
             @Valid @RequestBody HotelPolicyRequest request
@@ -115,12 +132,14 @@ public class ProviderAccommodationController {
     }
 
     @PutMapping("/hotel-bookings/{bookingId}/check-in")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<HotelBookingResponse>> checkIn(@PathVariable UUID bookingId) {
         HotelBookingResponse response = accommodationService.checkIn(bookingId);
         return ResponseEntity.ok(ApiResponse.success(response, "Guest checked in"));
     }
 
     @PutMapping("/hotel-bookings/{bookingId}/check-out")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_PROVIDER')")
     public ResponseEntity<ApiResponse<HotelBookingResponse>> checkOut(@PathVariable UUID bookingId) {
         HotelBookingResponse response = accommodationService.checkOut(bookingId);
         return ResponseEntity.ok(ApiResponse.success(response, "Guest checked out"));

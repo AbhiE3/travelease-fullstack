@@ -11,6 +11,8 @@ public interface RoomRepository extends JpaRepository<Room, UUID> {
 
     List<Room> findByHotelId(UUID hotelId);
 
+    List<Room> findByHotel_ProviderId(Long providerId);
+
     Optional<Room> findFirstByHotelIdAndRoomTypeIgnoreCaseAndAvailabilityStatusIgnoreCase(
             UUID hotelId,
             String roomType,

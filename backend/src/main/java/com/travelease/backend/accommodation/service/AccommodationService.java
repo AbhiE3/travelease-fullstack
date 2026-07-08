@@ -28,7 +28,15 @@ public interface AccommodationService {
 
     HotelResponse createHotel(HotelRequest request);
 
-    List<HotelResponse> getProviderHotels();
+    List<HotelResponse> getProviderHotels(Long providerId);
+
+    /**
+     * Hotel Provider management variant of {@link #getHotelDetails(UUID)}: same
+     * response shape, but additionally asserts that the caller's effective Hotel
+     * Provider tenant owns the hotel. getHotelDetails itself stays unscoped because
+     * it also backs the public/traveler-facing GET /api/hotels/{hotelId} endpoint.
+     */
+    HotelDetailsResponse getProviderHotelDetails(UUID hotelId);
 
     HotelResponse updateHotel(UUID hotelId, HotelRequest request);
 
@@ -44,7 +52,7 @@ public interface AccommodationService {
 
     RoomResponse blockMaintenance(UUID roomId);
 
-    List<RoomResponse> getInventory();
+    List<RoomResponse> getInventory(Long providerId);
 
     BookingValidationResponse validateBooking(HotelBookingRequest request);
 
@@ -52,21 +60,21 @@ public interface AccommodationService {
 
     HotelBookingResponse createBooking(HotelBookingRequest request, String currentUserEmail);
 
-    HotelBookingResponse getBooking(UUID bookingId);
+    HotelBookingResponse getBooking(UUID bookingId, String currentUserEmail);
 
-    HotelBookingResponse updateBooking(UUID bookingId, HotelBookingRequest request);
+    HotelBookingResponse updateBooking(UUID bookingId, HotelBookingRequest request, String currentUserEmail);
 
-    HotelBookingResponse cancelBooking(UUID bookingId);
+    HotelBookingResponse cancelBooking(UUID bookingId, String currentUserEmail);
 
     List<HotelBookingResponse> getMyBookings(String currentUserEmail);
 
-    HotelBillResponse getBill(UUID bookingId);
+    HotelBillResponse getBill(UUID bookingId, String currentUserEmail);
 
-    HotelBookingResponse attachBookingToTrip(UUID tripId, AttachHotelBookingRequest request);
+    HotelBookingResponse attachBookingToTrip(UUID tripId, AttachHotelBookingRequest request, String currentUserEmail);
 
-    void removeBookingFromTrip(UUID tripId, UUID bookingId);
+    void removeBookingFromTrip(UUID tripId, UUID bookingId, String currentUserEmail);
 
-    AccommodationSummaryResponse getAccommodationSummary(UUID tripId);
+    AccommodationSummaryResponse getAccommodationSummary(UUID tripId, String currentUserEmail);
 
     List<HotelReviewResponse> getReviews(UUID hotelId);
 
