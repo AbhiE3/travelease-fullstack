@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NgIcon } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
@@ -9,7 +10,7 @@ import { ROLE_HOME } from '@app/core/auth/auth.models';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, HlmButtonImports, HlmInputImports, HlmLabelImports],
+  imports: [RouterLink, NgIcon, HlmButtonImports, HlmInputImports, HlmLabelImports],
   templateUrl: './login.html',
 })
 export class Login {
@@ -18,12 +19,17 @@ export class Login {
 
   protected readonly error = signal<string | null>(null);
   protected readonly submitting = signal(false);
+  protected readonly passwordVisible = signal(false);
 
   constructor() {
     const role = this.authService.isAuthenticated() ? this.authService.role() : null;
     if (role) {
       this.router.navigate([ROLE_HOME[role]]);
     }
+  }
+
+  protected togglePasswordVisibility(): void {
+    this.passwordVisible.update((visible) => !visible);
   }
 
   protected async onSubmit(event: Event, email: string, password: string): Promise<void> {
