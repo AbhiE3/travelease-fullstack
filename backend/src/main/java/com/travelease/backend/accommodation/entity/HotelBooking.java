@@ -2,6 +2,7 @@ package com.travelease.backend.accommodation.entity;
 
 import com.travelease.backend.auth.entity.User;
 import com.travelease.backend.shared.entity.BaseEntity;
+import com.travelease.backend.trip.entity.Trip;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +15,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -23,32 +23,34 @@ import java.util.UUID;
 @Table(name = "hotel_bookings")
 public class HotelBooking extends BaseEntity {
 
-    @Column(name = "trip_id")
-    private UUID tripId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
     private Hotel hotel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booked_by_user_id")
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booked_by", nullable = false)
     private User bookedBy;
 
-    @Column(name = "check_in_date", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trip_id")
+    private Trip trip;
+
+    @Column(nullable = false)
     private LocalDate checkInDate;
 
-    @Column(name = "check_out_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate checkOutDate;
 
-    @Column(name = "room_type", nullable = false, length = 80)
-    private String roomType;
+    @Column(nullable = false)
+    private Integer guests;
 
-    @Column(name = "room_number", length = 30)
-    private String roomNumber;
-
-    @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
-    private BigDecimal totalAmount;
-
-    @Column(name = "booking_status", nullable = false, length = 30)
+    @Column(nullable = false, length = 40)
     private String bookingStatus;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal totalAmount;
 }

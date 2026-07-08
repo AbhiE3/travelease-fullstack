@@ -5,16 +5,16 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record HotelBookingResponse(
-        UUID hotelBookingId,
-        UUID tripId,
+        UUID bookingId,
         UUID hotelId,
         String hotelName,
-        UUID bookedByUserId,
+        UUID roomId,
+        String roomType,
+        UUID tripId,
         LocalDate checkInDate,
         LocalDate checkOutDate,
-        String roomType,
-        String roomNumber,
-        BigDecimal totalAmount,
-        String bookingStatus
+        Integer guests,
+        String bookingStatus,
+        BigDecimal totalAmount
 ) {
 }

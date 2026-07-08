@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface HotelBookingRepository extends JpaRepository<HotelBooking, UUID> {
+    List<HotelBooking> findByBookedByEmailOrderByCreatedAtDesc(String email);
 
     List<HotelBooking> findByTripId(UUID tripId);
-
-    List<HotelBooking> findByHotelId(UUID hotelId);
-
-    List<HotelBooking> findByBookedByEmail(String email);
 }

@@ -20,8 +20,10 @@ public class UserHotelBookingController {
     private final AccommodationService accommodationService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<HotelBookingResponse>>> myBookings(Authentication authentication) {
-        List<HotelBookingResponse> response = accommodationService.getMyBookings(authentication.getName());
-        return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking history retrieved"));
+    public ResponseEntity<ApiResponse<List<HotelBookingResponse>>> getMyBookings(Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.success(
+                accommodationService.getMyBookings(authentication.getName()),
+                "Hotel booking history retrieved"
+        ));
     }
 }

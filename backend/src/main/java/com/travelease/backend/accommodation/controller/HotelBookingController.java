@@ -30,53 +30,72 @@ public class HotelBookingController {
     private final AccommodationService accommodationService;
 
     @PostMapping("/validate")
-    public ResponseEntity<ApiResponse<BookingValidationResponse>> validate(
+    public ResponseEntity<ApiResponse<BookingValidationResponse>> validateBooking(
             @Valid @RequestBody HotelBookingRequest request
     ) {
-        BookingValidationResponse response = accommodationService.validateBooking(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Booking validation completed"));
+        return ResponseEntity.ok(ApiResponse.success(accommodationService.validateBooking(request), "Booking validated"));
     }
 
     @PostMapping("/quote")
-    public ResponseEntity<ApiResponse<BookingQuoteResponse>> quote(@Valid @RequestBody HotelBookingRequest request) {
-        BookingQuoteResponse response = accommodationService.quoteBooking(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking quote generated"));
+    public ResponseEntity<ApiResponse<BookingQuoteResponse>> quoteBooking(
+            @Valid @RequestBody HotelBookingRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(accommodationService.quoteBooking(request), "Booking quote generated"));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<HotelBookingResponse>> create(
+    public ResponseEntity<ApiResponse<HotelBookingResponse>> createBooking(
             @Valid @RequestBody HotelBookingRequest request,
             Authentication authentication
     ) {
-        HotelBookingResponse response = accommodationService.createBooking(request, authentication.getName());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response, "Hotel booking confirmed"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(
+                accommodationService.createBooking(request, authentication.getName()),
+                "Hotel booking confirmed"
+        ));
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<ApiResponse<HotelBookingResponse>> getBooking(@PathVariable UUID bookingId) {
-        HotelBookingResponse response = accommodationService.getBooking(bookingId);
-        return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking retrieved"));
+    public ResponseEntity<ApiResponse<HotelBookingResponse>> getBooking(
+            @PathVariable UUID bookingId,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                accommodationService.getBooking(bookingId, authentication.getName()),
+                "Hotel booking retrieved"
+        ));
     }
 
     @PutMapping("/{bookingId}")
-    public ResponseEntity<ApiResponse<HotelBookingResponse>> update(
+    public ResponseEntity<ApiResponse<HotelBookingResponse>> modifyBooking(
             @PathVariable UUID bookingId,
-            @Valid @RequestBody HotelBookingRequest request
+            @Valid @RequestBody HotelBookingRequest request,
+            Authentication authentication
     ) {
-        HotelBookingResponse response = accommodationService.updateBooking(bookingId, request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking updated"));
+        return ResponseEntity.ok(ApiResponse.success(
+                accommodationService.modifyBooking(bookingId, request, authentication.getName()),
+                "Hotel booking updated"
+        ));
     }
 
     @PutMapping("/{bookingId}/cancel")
-    public ResponseEntity<ApiResponse<HotelBookingResponse>> cancel(@PathVariable UUID bookingId) {
-        HotelBookingResponse response = accommodationService.cancelBooking(bookingId);
-        return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking cancelled"));
+    public ResponseEntity<ApiResponse<HotelBookingResponse>> cancelBooking(
+            @PathVariable UUID bookingId,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                accommodationService.cancelBooking(bookingId, authentication.getName()),
+                "Hotel booking cancelled"
+        ));
     }
 
     @GetMapping("/{bookingId}/bill")
-    public ResponseEntity<ApiResponse<HotelBillResponse>> bill(@PathVariable UUID bookingId) {
-        HotelBillResponse response = accommodationService.getBill(bookingId);
-        return ResponseEntity.ok(ApiResponse.success(response, "Hotel booking bill retrieved"));
+    public ResponseEntity<ApiResponse<HotelBillResponse>> getBill(
+            @PathVariable UUID bookingId,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                accommodationService.getBill(bookingId, authentication.getName()),
+                "Hotel bill generated"
+        ));
     }
 }

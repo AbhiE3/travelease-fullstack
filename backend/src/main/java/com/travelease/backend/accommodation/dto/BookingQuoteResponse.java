@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record BookingQuoteResponse(
         UUID hotelId,
+        UUID roomId,
         String roomType,
         LocalDate checkInDate,
         LocalDate checkOutDate,
