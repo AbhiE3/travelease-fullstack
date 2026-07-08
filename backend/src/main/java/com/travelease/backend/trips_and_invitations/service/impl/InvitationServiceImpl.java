@@ -44,6 +44,9 @@ public class InvitationServiceImpl implements InvitationService{
 	            .orElseThrow(() -> new ResourceNotFoundException("Organizer not found"));
 	    List<InvitationResponse> responses =new ArrayList<>();
 	    for(String email:request.getInviteeEmails()) {
+			 if(invitationRepository.existsByTripTripIdAndInviteeEmail(tripId,email){
+				 throw new RuntimeException("Traveler is already invited to this trip");
+			 }
 	    	Invitation invitation = Invitation.builder()
 	    	        .trip(trip)
 	    	        .invitedBy(organizer)
