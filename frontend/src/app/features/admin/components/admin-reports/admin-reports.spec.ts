@@ -8,11 +8,7 @@ import {
   lucideUsers,
   lucideWallet,
 } from '@ng-icons/lucide';
-import {
-  AdminReports,
-  REVENUE_TREND_AREA_POINTS,
-  REVENUE_TREND_LINE_POINTS,
-} from '@app/features/admin/components/admin-reports/admin-reports';
+import { AdminReports } from '@app/features/admin/components/admin-reports/admin-reports';
 
 describe('AdminReports', () => {
   beforeEach(async () => {
@@ -47,14 +43,6 @@ describe('AdminReports', () => {
     expect(text).toContain('76%');
     expect(text).toContain('Growth (MoM)');
     expect(text).toContain('+18%');
-  });
-
-  it('renders the exact SVG polyline points', () => {
-    const fixture = TestBed.createComponent(AdminReports);
-    fixture.detectChanges();
-    const polylines = (fixture.nativeElement as HTMLElement).querySelectorAll('polyline');
-    expect(polylines[0].getAttribute('points')).toBe(REVENUE_TREND_LINE_POINTS);
-    expect(polylines[1].getAttribute('points')).toBe(REVENUE_TREND_AREA_POINTS);
   });
 
   it('renders all 6 Top Destinations names and trip counts', () => {

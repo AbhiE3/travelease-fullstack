@@ -1,4 +1,5 @@
 import { AppShell } from '@app/shared/layout/app-shell/app-shell';
+import { authGuard } from '@app/core/auth/auth.guard';
 import { TransportDashboard } from '@app/features/transport/components/transport-dashboard/transport-dashboard';
 import { ManageVehicles } from '@app/features/transport/components/manage-vehicles/manage-vehicles';
 import { ManageRoutes } from '@app/features/transport/components/manage-routes/manage-routes';
@@ -12,6 +13,7 @@ describe('TRANSPORT_ROUTES', () => {
     const shellRoute = TRANSPORT_ROUTES[0];
     expect(shellRoute.path).toBe('');
     expect(shellRoute.data?.['role']).toBe('transport');
+    expect(shellRoute.canActivate).toEqual([authGuard]);
     const loaded = await shellRoute.loadComponent!();
     expect(loaded).toBe(AppShell);
   });

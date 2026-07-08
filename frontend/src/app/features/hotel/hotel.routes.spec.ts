@@ -1,4 +1,5 @@
 import { AppShell } from '@app/shared/layout/app-shell/app-shell';
+import { authGuard } from '@app/core/auth/auth.guard';
 import { HotelDashboard } from '@app/features/hotel/components/hotel-dashboard/hotel-dashboard';
 import { HotelProperties } from '@app/features/hotel/components/hotel-properties/hotel-properties';
 import { ManageRooms } from '@app/features/hotel/components/manage-rooms/manage-rooms';
@@ -13,6 +14,7 @@ describe('HOTEL_ROUTES', () => {
     const shellRoute = HOTEL_ROUTES[0];
     expect(shellRoute.path).toBe('');
     expect(shellRoute.data?.['role']).toBe('hotel');
+    expect(shellRoute.canActivate).toEqual([authGuard]);
     const loaded = await shellRoute.loadComponent!();
     expect(loaded).toBe(AppShell);
   });

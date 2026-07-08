@@ -45,6 +45,9 @@ public class DemoDataInitializer implements CommandLineRunner {
     public static final UUID ALICE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     public static final UUID BOB_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
     public static final UUID CARA_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
+    public static final UUID TRANSPORT_PROVIDER_ID = UUID.fromString("88888888-8888-8888-8888-888888888888");
+    public static final UUID HOTEL_PROVIDER_ID = UUID.fromString("99999999-9999-9999-9999-999999999999");
+    public static final UUID ACTIVITY_PROVIDER_ID = UUID.fromString("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
     public static final UUID TRIP_ID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
     public static final UUID EXPENSE_ID = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
     public static final UUID SETTLEMENT_BOB_TO_ALICE_ID = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc");
@@ -64,10 +67,13 @@ public class DemoDataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        User admin = getOrCreateUser(ADMIN_ID, "Admin User", "admin@travelease.test", "9000000000", Role.ROLE_ADMIN);
-        User alice = getOrCreateUser(ALICE_ID, "Alice Traveler", "alice@travelease.test", "9000000001", Role.ROLE_TRAVELER);
-        User bob = getOrCreateUser(BOB_ID, "Bob Traveler", "bob@travelease.test", "9000000002", Role.ROLE_TRAVELER);
-        User cara = getOrCreateUser(CARA_ID, "Cara Traveler", "cara@travelease.test", "9000000003", Role.ROLE_TRAVELER);
+        User admin = getOrCreateUser(ADMIN_ID, "Admin User", "admin@travelease.test", "9000000000", Role.ROLE_ADMIN, null);
+        User alice = getOrCreateUser(ALICE_ID, "Alice Traveler", "alice@travelease.test", "9000000001", Role.ROLE_TRAVELER, null);
+        User bob = getOrCreateUser(BOB_ID, "Bob Traveler", "bob@travelease.test", "9000000002", Role.ROLE_TRAVELER, null);
+        User cara = getOrCreateUser(CARA_ID, "Cara Traveler", "cara@travelease.test", "9000000003", Role.ROLE_TRAVELER, null);
+        getOrCreateUser(TRANSPORT_PROVIDER_ID, "Priya Transport Provider", "provider@travelease.test", "9000000004", Role.ROLE_PROVIDER, 1L);
+        getOrCreateUser(HOTEL_PROVIDER_ID, "Rahul Hotel Provider", "hotelprovider@travelease.test", "9000000005", Role.ROLE_HOTEL_PROVIDER, 1L);
+        getOrCreateUser(ACTIVITY_PROVIDER_ID, "Meera Activity Provider", "activityprovider@travelease.test", "9000000006", Role.ROLE_ACTIVITY_PROVIDER, 1L);
 
         seedExpenseData(alice, bob, cara);
         seedBusBookingData(admin);
@@ -144,7 +150,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         busScheduleRepository.save(schedule);
     }
 
-    private User getOrCreateUser(UUID id, String name, String email, String phone, Role role) {
+    private User getOrCreateUser(UUID id, String name, String email, String phone, Role role, Long providerId) {
         return userRepository.findByEmail(email).orElseGet(() -> {
             User user = new User();
             user.setId(id);
@@ -153,6 +159,7 @@ public class DemoDataInitializer implements CommandLineRunner {
             user.setPhone(phone);
             user.setPasswordHash(passwordEncoder.encode("password123"));
             user.setRole(role);
+            user.setProviderId(providerId);
             return userRepository.save(user);
         });
     }
