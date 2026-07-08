@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '@app/core/auth/auth.guard';
 
 export const ACTIVITY_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () => import('@app/shared/layout/app-shell/app-shell').then((m) => m.AppShell),
     data: { role: 'activity' },
+    canActivate: [authGuard],
     children: [
       {
         path: '',

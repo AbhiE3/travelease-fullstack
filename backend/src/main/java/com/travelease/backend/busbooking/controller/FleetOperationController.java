@@ -48,7 +48,7 @@ public class FleetOperationController {
 
     @GetMapping("/drivers")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get drivers with optional filters")
+    @Operation(summary = "Get drivers with optional filters", description = "Get drivers with optional filters")
     public ResponseEntity<ApiResponse<List<DriverResponse>>> getAllDrivers(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) DriverStatus status,
@@ -60,7 +60,7 @@ public class FleetOperationController {
 
     @GetMapping("/drivers/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get driver by ID")
+    @Operation(summary = "Get driver by ID", description = "Get driver by ID")
     public ResponseEntity<ApiResponse<DriverResponse>> getDriverById(@PathVariable Long id) {
         assertOwnsDriver(id);
         DriverResponse response = driverService.getDriverById(id);
@@ -69,7 +69,7 @@ public class FleetOperationController {
 
     @PostMapping("/drivers")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Create driver")
+    @Operation(summary = "Create driver", description = "Create driver")
     public ResponseEntity<ApiResponse<DriverResponse>> createDriver(@Valid @RequestBody DriverRequest request) {
         request.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
         DriverResponse response = driverService.createDriver(request);
@@ -79,7 +79,7 @@ public class FleetOperationController {
 
     @PutMapping("/drivers/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Update driver")
+    @Operation(summary = "Update driver", description = "Update driver")
     public ResponseEntity<ApiResponse<DriverResponse>> updateDriver(@PathVariable Long id, @Valid @RequestBody DriverRequest request) {
         assertOwnsDriver(id);
         request.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
@@ -89,7 +89,7 @@ public class FleetOperationController {
 
     @DeleteMapping("/drivers/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Deactivate driver")
+    @Operation(summary = "Deactivate driver", description = "Deactivate driver")
     public ResponseEntity<ApiResponse<MessageResponse>> deactivateDriver(@PathVariable Long id) {
         assertOwnsDriver(id);
         driverService.deactivateDriver(id);
@@ -100,7 +100,7 @@ public class FleetOperationController {
 
     @GetMapping("/conductors")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get conductors with optional filters")
+    @Operation(summary = "Get conductors with optional filters", description = "Get conductors with optional filters")
     public ResponseEntity<ApiResponse<List<ConductorResponse>>> getAllConductors(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) ConductorStatus status,
@@ -112,7 +112,7 @@ public class FleetOperationController {
 
     @GetMapping("/conductors/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get conductor by ID")
+    @Operation(summary = "Get conductor by ID", description = "Get conductor by ID")
     public ResponseEntity<ApiResponse<ConductorResponse>> getConductorById(@PathVariable Long id) {
         assertOwnsConductor(id);
         ConductorResponse response = conductorService.getConductorById(id);
@@ -121,7 +121,7 @@ public class FleetOperationController {
 
     @PostMapping("/conductors")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Create conductor")
+    @Operation(summary = "Create conductor", description = "Create conductor")
     public ResponseEntity<ApiResponse<ConductorResponse>> createConductor(@Valid @RequestBody ConductorRequest request) {
         request.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
         ConductorResponse response = conductorService.createConductor(request);
@@ -131,7 +131,7 @@ public class FleetOperationController {
 
     @PutMapping("/conductors/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Update conductor")
+    @Operation(summary = "Update conductor", description = "Update conductor")
     public ResponseEntity<ApiResponse<ConductorResponse>> updateConductor(@PathVariable Long id, @Valid @RequestBody ConductorRequest request) {
         assertOwnsConductor(id);
         request.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
@@ -141,7 +141,7 @@ public class FleetOperationController {
 
     @DeleteMapping("/conductors/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Deactivate conductor")
+    @Operation(summary = "Deactivate conductor", description = "Deactivate conductor")
     public ResponseEntity<ApiResponse<MessageResponse>> deactivateConductor(@PathVariable Long id) {
         assertOwnsConductor(id);
         conductorService.deactivateConductor(id);
@@ -152,7 +152,7 @@ public class FleetOperationController {
 
     @GetMapping("/maintenance")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get maintenance records with optional filters")
+    @Operation(summary = "Get maintenance records with optional filters", description = "Get maintenance records with optional filters")
     public ResponseEntity<ApiResponse<List<MaintenanceResponse>>> getMaintenanceRecords(
             @RequestParam(required = false) Long busId,
             @RequestParam(required = false) MaintenanceStatus status,
@@ -167,7 +167,7 @@ public class FleetOperationController {
 
     @GetMapping("/maintenance/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get maintenance record by ID")
+    @Operation(summary = "Get maintenance record by ID", description = "Get maintenance record by ID")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> getMaintenanceById(@PathVariable Long id) {
         assertOwnsMaintenance(id);
         MaintenanceResponse response = maintenanceService.getMaintenanceById(id);
@@ -176,7 +176,7 @@ public class FleetOperationController {
 
     @PostMapping("/maintenance")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Schedule maintenance")
+    @Operation(summary = "Schedule maintenance", description = "Schedule maintenance")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> scheduleMaintenance(@Valid @RequestBody MaintenanceRequest request) {
         assertOwnsBus(request.getBusId());
         MaintenanceResponse response = maintenanceService.scheduleMaintenance(request);
@@ -186,7 +186,7 @@ public class FleetOperationController {
 
     @PutMapping("/maintenance/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Update maintenance record")
+    @Operation(summary = "Update maintenance record", description = "Update maintenance record")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> updateMaintenance(@PathVariable Long id, @Valid @RequestBody MaintenanceRequest request) {
         // Ownership is asserted against the maintenance record's actual bus (not
         // request.getBusId()): MaintenanceServiceImpl.updateMaintenance never
@@ -200,7 +200,7 @@ public class FleetOperationController {
 
     @PatchMapping("/maintenance/{id}/status")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Transition maintenance status (start/complete/cancel)")
+    @Operation(summary = "Transition maintenance status (start/complete/cancel)", description = "Transition maintenance status (start/complete/cancel)")
     public ResponseEntity<ApiResponse<MaintenanceResponse>> transitionMaintenanceStatus(
             @PathVariable Long id,
             @Valid @RequestBody MaintenanceStatusTransitionRequest request) {
@@ -211,7 +211,7 @@ public class FleetOperationController {
 
     @GetMapping("/maintenance/bus/{busId}/cost")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get total maintenance cost by bus")
+    @Operation(summary = "Get total maintenance cost by bus", description = "Get total maintenance cost by bus")
     public ResponseEntity<ApiResponse<Double>> getTotalMaintenanceCost(@PathVariable Long busId) {
         assertOwnsBus(busId);
         Double cost = maintenanceService.getTotalMaintenanceCost(busId);
@@ -222,7 +222,7 @@ public class FleetOperationController {
 
     @GetMapping("/trips")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get trips with optional filters")
+    @Operation(summary = "Get trips with optional filters", description = "Get trips with optional filters")
     public ResponseEntity<ApiResponse<List<TripResponse>>> getTrips(
             @RequestParam(required = false) Long scheduleId,
             @RequestParam(required = false) Long driverId,
@@ -248,7 +248,7 @@ public class FleetOperationController {
 
     @GetMapping("/trips/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get trip by ID")
+    @Operation(summary = "Get trip by ID", description = "Get trip by ID")
     public ResponseEntity<ApiResponse<TripResponse>> getTripById(@PathVariable Long id) {
         assertOwnsTrip(id);
         TripResponse response = tripService.getTripById(id);
@@ -257,7 +257,7 @@ public class FleetOperationController {
 
     @PostMapping("/trips/assign")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Assign trip")
+    @Operation(summary = "Assign trip", description = "Assign trip")
     public ResponseEntity<ApiResponse<TripResponse>> assignTrip(@Valid @RequestBody TripAssignmentRequest request) {
         assertOwnsSchedule(request.getScheduleId());
         TripResponse response = tripService.assignTrip(request);
@@ -267,7 +267,7 @@ public class FleetOperationController {
 
     @PatchMapping("/trips/{id}/status")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Transition trip status (boarding/depart/running/delayed/arrived/complete/cancel)")
+    @Operation(summary = "Transition trip status (boarding/depart/running/delayed/arrived/complete/cancel)", description = "Transition trip status (boarding/depart/running/delayed/arrived/complete/cancel)")
     public ResponseEntity<ApiResponse<TripResponse>> transitionTripStatus(
             @PathVariable Long id,
             @Valid @RequestBody TripStatusTransitionRequest request) {
@@ -280,7 +280,7 @@ public class FleetOperationController {
 
     @GetMapping("/fleet/availability/{providerId}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get fleet availability by provider")
+    @Operation(summary = "Get fleet availability by provider", description = "Get fleet availability by provider")
     public ResponseEntity<ApiResponse<FleetAvailabilityResponse>> getFleetAvailability(@PathVariable Long providerId) {
         Long effectiveProviderId = securityUtil.resolveEffectiveProviderId(providerId);
         FleetAvailabilityResponse response = tripService.getFleetAvailability(effectiveProviderId);
@@ -314,3 +314,4 @@ public class FleetOperationController {
         securityUtil.resolveEffectiveProviderId(tripService.getTripById(tripId).getProviderId());
     }
 }
+

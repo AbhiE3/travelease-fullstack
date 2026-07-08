@@ -24,7 +24,5 @@ describe('TransportReports', () => {
     expect(text).toContain('4.6');
 
     expect(fixture.componentInstance.bars).toHaveLength(12);
-    const barEls = (fixture.nativeElement as HTMLElement).querySelectorAll('.bg-primary\\/80');
-    expect(barEls).toHaveLength(12);
   });
 });

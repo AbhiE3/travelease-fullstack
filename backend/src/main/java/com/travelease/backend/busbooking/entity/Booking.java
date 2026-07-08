@@ -28,6 +28,18 @@ public class Booking {
     @Column(name = "user_id", nullable = false)
     private java.util.UUID userId;
 
+    /**
+     * Optional association to the Traveler planning Trip (trip.entity.Trip, a
+     * different domain from this module's own operational Trip/BusSchedule
+     * lifecycle) that this booking has been attached to for shared trip planning.
+     * Named travelerTripId (not tripId) to avoid ambiguity with this module's
+     * operational Trip concept. Bare UUID, no FK/relationship - mirrors
+     * HotelBooking.tripId's cross-module association shape rather than importing
+     * the Traveler Trip entity into this domain.
+     */
+    @Column(name = "traveler_trip_id")
+    private java.util.UUID travelerTripId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)
     private BusSchedule schedule;

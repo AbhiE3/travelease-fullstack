@@ -33,7 +33,7 @@ public class FareController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create a fare rule")
+    @Operation(summary = "Create a fare rule", description = "Create a fare rule")
     public ResponseEntity<ApiResponse<FareResponse>> createFareRule(@Valid @RequestBody FareRequest request) {
         FareResponse response = fareService.createFareRule(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -42,7 +42,7 @@ public class FareController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update a fare rule")
+    @Operation(summary = "Update a fare rule", description = "Update a fare rule")
     public ResponseEntity<ApiResponse<FareResponse>> updateFareRule(@PathVariable Long id,
                                                                      @Valid @RequestBody FareRequest request) {
         FareResponse response = fareService.updateFareRule(id, request);
@@ -51,21 +51,21 @@ public class FareController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Deactivate a fare rule")
+    @Operation(summary = "Deactivate a fare rule", description = "Deactivate a fare rule")
     public ResponseEntity<ApiResponse<Void>> deleteFareRule(@PathVariable Long id) {
         fareService.deleteFareRule(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Fare rule deactivated successfully", null, "/api/fares/" + id));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get fare rule by ID")
+    @Operation(summary = "Get fare rule by ID", description = "Get fare rule by ID")
     public ResponseEntity<ApiResponse<FareResponse>> getFareRuleById(@PathVariable Long id) {
         FareResponse response = fareService.getFareRuleById(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Fare rule fetched successfully", response, "/api/fares/" + id));
     }
 
     @GetMapping
-    @Operation(summary = "Get fare rules with optional filters")
+    @Operation(summary = "Get fare rules with optional filters", description = "Get fare rules with optional filters")
     public ResponseEntity<ApiResponse<List<FareResponse>>> getFareRules(
             @RequestParam(required = false) Long routeId,
             @RequestParam(required = false) BusType busType,
@@ -79,7 +79,7 @@ public class FareController {
     // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
     @PostMapping("/calculate")
-    @Operation(summary = "Price calculator Ã¢â‚¬â€ returns final payable amount with full breakdown")
+    @Operation(summary = "Price calculator Ã¢â‚¬â€ returns final payable amount with full breakdown", description = "Price calculator Ã¢â‚¬â€ returns final payable amount with full breakdown")
     public ResponseEntity<ApiResponse<PriceCalculatorResponse>> calculatePrice(
             @Valid @RequestBody FareCalculationRequest request) {
         PriceCalculatorResponse response = fareService.calculatePrice(request);
@@ -92,7 +92,7 @@ public class FareController {
     // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
     @GetMapping("/cancellation-preview/{scheduleId}")
-    @Operation(summary = "Preview cancellation outcome for a schedule (charge + refundable amount)")
+    @Operation(summary = "Preview cancellation outcome for a schedule (charge + refundable amount)", description = "Preview cancellation outcome for a schedule (charge + refundable amount)")
     public ResponseEntity<ApiResponse<CancellationPreviewResponse>> getCancellationPreview(
             @PathVariable Long scheduleId, @RequestParam Double totalFare) {
         CancellationPreviewResponse preview = fareService.getCancellationPreview(scheduleId, totalFare);
@@ -100,3 +100,4 @@ public class FareController {
                 "Cancellation preview calculated successfully", preview, "/api/fares/cancellation-preview/" + scheduleId));
     }
 }
+

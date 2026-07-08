@@ -33,7 +33,7 @@ public class ReportController {
 
     @PostMapping("/generate")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Generate report by type with filters")
+    @Operation(summary = "Generate report by type with filters", description = "Generate report by type with filters")
     public ResponseEntity<ApiResponse<ReportResponse>> generateReport(
             @RequestParam ReportType reportType,
             @RequestBody(required = false) ReportFilterRequest filters) {
@@ -48,7 +48,7 @@ public class ReportController {
 
     @PostMapping("/export")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Export report as CSV or Excel")
+    @Operation(summary = "Export report as CSV or Excel", description = "Export report as CSV or Excel")
     public ResponseEntity<?> exportReport(@Valid @RequestBody ReportExportRequest request) {
         ReportFilterRequest filters = new ReportFilterRequest();
         filters.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
@@ -80,7 +80,7 @@ public class ReportController {
 
     @GetMapping("/history")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get report history with filters")
+    @Operation(summary = "Get report history with filters", description = "Get report history with filters")
     public ResponseEntity<ApiResponse<List<ReportHistoryResponse>>> getReportHistory(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) ReportType reportType,
@@ -92,3 +92,4 @@ public class ReportController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Report history fetched successfully", response, "/api/reports/history"));
     }
 }
+

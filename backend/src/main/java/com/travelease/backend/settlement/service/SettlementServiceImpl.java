@@ -12,6 +12,7 @@ import com.travelease.backend.settlement.repository.SettlementRepository;
 import com.travelease.backend.shared.exception.ResourceNotFoundException;
 import com.travelease.backend.trip.entity.Trip;
 import com.travelease.backend.trip.entity.TripMember;
+import com.travelease.backend.trip.entity.TripMemberStatus;
 import com.travelease.backend.trip.repository.TripMemberRepository;
 import com.travelease.backend.trip.repository.TripRepository;
 import lombok.RequiredArgsConstructor;
@@ -179,7 +180,7 @@ public class SettlementServiceImpl implements SettlementService {
     }
 
     private void ensureCurrentUserIsMember(UUID tripId, String email) {
-        if (!tripMemberRepository.existsByTripIdAndUserEmail(tripId, email)) {
+        if (!tripMemberRepository.existsByTripIdAndUserEmailAndMemberStatus(tripId, email, TripMemberStatus.ACCEPTED)) {
             throw new AccessDeniedException("Current user is not a member of this trip");
         }
     }

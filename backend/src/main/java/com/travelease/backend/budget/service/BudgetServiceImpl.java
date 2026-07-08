@@ -29,7 +29,8 @@ public class BudgetServiceImpl implements BudgetService {
     @Transactional(readOnly = true)
     public BudgetResponse getMyBudget(UUID tripId, String currentUserEmail) {
         ensureTripExists(tripId);
-        TripMember member = tripMemberRepository.findByTripIdAndUserEmail(tripId, currentUserEmail)
+        TripMember member = tripMemberRepository
+                .findByTripIdAndUserEmailAndMemberStatus(tripId, currentUserEmail, TripMemberStatus.ACCEPTED)
                 .orElseThrow(() -> new AccessDeniedException("Current user is not a member of this trip"));
 
         return budgetMapper.toResponse(
@@ -76,7 +77,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     private void ensureCurrentUserIsMember(UUID tripId, String email) {
-        if (!tripMemberRepository.existsByTripIdAndUserEmail(tripId, email)) {
+        if (!tripMemberRepository.existsByTripIdAndUserEmailAndMemberStatus(tripId, email, TripMemberStatus.ACCEPTED)) {
             throw new AccessDeniedException("Current user is not a member of this trip");
         }
     }

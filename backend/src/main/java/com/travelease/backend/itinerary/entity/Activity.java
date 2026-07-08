@@ -18,6 +18,15 @@ public class Activity {
     @Column(name = "ActivityID")
     private String activityId;
 
+    /**
+     * The Activity Provider tenant that owns this activity. Assigned server-side
+     * from the authenticated ROLE_ACTIVITY_PROVIDER account (or explicitly by
+     * ROLE_ADMIN) at creation time; never accepted as client-authoritative on
+     * update. Mirrors Hotel.providerId's role for the accommodation domain.
+     */
+    @Column(name = "provider_id", nullable = false)
+    private Long providerId;
+
     @Column(name = "DestinationID")
     private Integer destinationId;
 

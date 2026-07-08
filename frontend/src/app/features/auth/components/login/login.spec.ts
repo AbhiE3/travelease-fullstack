@@ -1,94 +1,88 @@
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { Login, matchRole } from '@app/features/auth/components/login/login';
-
-describe('matchRole', () => {
-  it('returns the correct route for each of the 5 valid credential pairs', () => {
-    expect(matchRole('user', 'user123')).toBe('/dashboard');
-    expect(matchRole('admin', 'admin123')).toBe('/admin');
-    expect(matchRole('hotel', 'hotel123')).toBe('/hotel');
-    expect(matchRole('bus', 'bus123')).toBe('/transport');
-    expect(matchRole('activity', 'activity123')).toBe('/activity');
-  });
-
-  it('returns null for a wrong password on a valid username', () => {
-    expect(matchRole('admin', 'wrongpassword')).toBeNull();
-  });
-
-  it('returns null for an unknown username', () => {
-    expect(matchRole('nope', 'nope123')).toBeNull();
-  });
-});
+import { HttpErrorResponse } from '@angular/common/http';
+import { Login } from '@app/features/auth/components/login/login';
+import { AuthService } from '@app/core/auth/auth.service';
 
 describe('Login', () => {
-  async function setup() {
+  async function setup(overrides: Partial<AuthService> = {}, authenticated = false) {
     await TestBed.configureTestingModule({
       imports: [Login],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        {
+          provide: AuthService,
+          useValue: {
+            isAuthenticated: () => authenticated,
+            role: () => (authenticated ? 'admin' : null),
+            ...overrides,
+          },
+        },
+      ],
     }).compileComponents();
-    const fixture = TestBed.createComponent(Login);
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const fixture = TestBed.createComponent(Login);
     fixture.detectChanges();
     return { fixture, navigateSpy };
   }
 
-  function submitWith(el: HTMLElement, username: string, password: string) {
+  function submitWith(el: HTMLElement, email: string, password: string) {
     const inputs = Array.from(el.querySelectorAll('input')) as HTMLInputElement[];
-    inputs[0].value = username;
+    inputs[0].value = email;
     inputs[1].value = password;
     const form = el.querySelector('form')!;
     form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
   }
 
-  it('renders no prefilled values and no quick-switch buttons', async () => {
+  it('renders empty email and password fields', async () => {
     const { fixture } = await setup();
     const el = fixture.nativeElement as HTMLElement;
     const inputs = Array.from(el.querySelectorAll('input')) as HTMLInputElement[];
     expect(inputs[0].value).toBe('');
     expect(inputs[1].value).toBe('');
-    expect(el.textContent).not.toContain('Or enter as');
-    expect(el.querySelectorAll('button[type="button"]')).toHaveLength(0);
   });
 
-  it('navigates to the correct route for each of the 5 valid credential pairs', async () => {
-    const { fixture, navigateSpy } = await setup();
+  it('logs in and navigates to the mapped role home on success', async () => {
+    const login = vi.fn().mockResolvedValue({
+      id: '1',
+      name: 'Admin',
+      email: 'admin@travelease.test',
+      role: 'admin',
+    });
+    const { fixture, navigateSpy } = await setup({ login });
     const el = fixture.nativeElement as HTMLElement;
-    const pairs: Array<[string, string, string]> = [
-      ['user', 'user123', '/dashboard'],
-      ['admin', 'admin123', '/admin'],
-      ['hotel', 'hotel123', '/hotel'],
-      ['bus', 'bus123', '/transport'],
-      ['activity', 'activity123', '/activity'],
-    ];
-    for (const [username, password, route] of pairs) {
-      submitWith(el, username, password);
-      expect(navigateSpy).toHaveBeenCalledWith([route]);
-    }
+
+    submitWith(el, 'admin@travelease.test', 'password123');
+    await fixture.whenStable();
+
+    expect(login).toHaveBeenCalledWith('admin@travelease.test', 'password123');
+    expect(navigateSpy).toHaveBeenCalledWith(['/admin']);
   });
 
-  it('shows an inline error and does not navigate for an invalid pair', async () => {
-    const { fixture, navigateSpy } = await setup();
+  it('shows the backend error message and does not navigate on a failed login', async () => {
+    const httpError = new HttpErrorResponse({
+      status: 401,
+      error: {
+        success: false,
+        data: null,
+        error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' },
+      },
+    });
+    const login = vi.fn().mockRejectedValue(httpError);
+    const { fixture, navigateSpy } = await setup({ login });
     const el = fixture.nativeElement as HTMLElement;
-    submitWith(el, 'admin', 'wrongpassword');
+
+    submitWith(el, 'admin@travelease.test', 'wrongpassword');
+    await fixture.whenStable();
     fixture.detectChanges();
 
     expect(navigateSpy).not.toHaveBeenCalled();
-    expect(el.textContent).toContain('Invalid username or password');
+    expect(el.textContent).toContain('Invalid email or password');
   });
 
-  it('clears the error after a subsequent valid submit', async () => {
-    const { fixture, navigateSpy } = await setup();
-    const el = fixture.nativeElement as HTMLElement;
-
-    submitWith(el, 'admin', 'wrongpassword');
-    fixture.detectChanges();
-    expect(el.textContent).toContain('Invalid username or password');
-
-    submitWith(el, 'admin', 'admin123');
-    fixture.detectChanges();
-
-    expect(el.textContent).not.toContain('Invalid username or password');
+  it('redirects immediately to the role home if already authenticated', async () => {
+    const { navigateSpy } = await setup({}, true);
     expect(navigateSpy).toHaveBeenCalledWith(['/admin']);
   });
 

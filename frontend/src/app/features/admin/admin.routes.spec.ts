@@ -1,4 +1,5 @@
 import { AppShell } from '@app/shared/layout/app-shell/app-shell';
+import { authGuard } from '@app/core/auth/auth.guard';
 import { AdminDashboard } from '@app/features/admin/components/admin-dashboard/admin-dashboard';
 import { AdminRouteAnalytics } from '@app/features/admin/components/admin-route-analytics/admin-route-analytics';
 import { AdminPartners } from '@app/features/admin/components/admin-partners/admin-partners';
@@ -17,6 +18,7 @@ describe('ADMIN_ROUTES', () => {
     const shellRoute = ADMIN_ROUTES[0];
     expect(shellRoute.path).toBe('');
     expect(shellRoute.data?.['role']).toBe('admin');
+    expect(shellRoute.canActivate).toEqual([authGuard]);
     const loaded = await shellRoute.loadComponent!();
     expect(loaded).toBe(AppShell);
   });

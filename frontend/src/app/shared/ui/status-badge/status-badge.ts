@@ -13,6 +13,14 @@ const STATUS_CLASS_MAP: Record<string, string> = {
   planning: 'bg-warning/15 text-[oklch(0.45_0.12_75)] border-warning/20',
   ongoing: 'bg-accent/15 text-accent border-accent/20',
   completed: 'bg-muted text-muted-foreground border-border',
+  PLANNING: 'bg-warning/15 text-[oklch(0.45_0.12_75)] border-warning/20',
+  CONFIRMED: 'bg-success/10 text-success border-success/20',
+  ONGOING: 'bg-accent/15 text-accent border-accent/20',
+  COMPLETED: 'bg-muted text-muted-foreground border-border',
+  CANCELLED: 'bg-destructive/15 text-destructive border-destructive/20',
+  INVITED: 'bg-warning/15 text-[oklch(0.45_0.12_75)] border-warning/20',
+  ACCEPTED: 'bg-success/10 text-success border-success/20',
+  REJECTED: 'bg-destructive/15 text-destructive border-destructive/20',
 };
 
 @Component({

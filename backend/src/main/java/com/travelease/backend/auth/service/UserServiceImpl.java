@@ -8,9 +8,12 @@ import com.travelease.backend.auth.repository.UserRepository;
 import com.travelease.backend.shared.exception.DuplicateResourceException;
 import com.travelease.backend.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,18 @@ public class UserServiceImpl implements UserService {
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+    }
+
+    @Override
+    public List<UserResponse> searchTravelers(String query) {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+        return userRepository
+                .searchByRoleAndNameOrEmail(Role.ROLE_TRAVELER, query.trim(), PageRequest.of(0, 10))
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     private UserResponse toResponse(User user) {

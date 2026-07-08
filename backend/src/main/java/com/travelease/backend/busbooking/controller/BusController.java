@@ -28,7 +28,7 @@ public class BusController {
     private final SecurityUtil securityUtil;
 
     @GetMapping
-    @Operation(summary = "Get buses with optional filters")
+    @Operation(summary = "Get buses with optional filters", description = "Get buses with optional filters")
     public ResponseEntity<ApiResponse<List<BusResponse>>> getBuses(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) BusStatus status) {
@@ -37,7 +37,7 @@ public class BusController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get bus by ID")
+    @Operation(summary = "Get bus by ID", description = "Get bus by ID")
     public ResponseEntity<ApiResponse<BusResponse>> getBusById(@PathVariable Long id) {
         BusResponse response = busService.getBusById(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Bus fetched successfully", response, "/api/buses/" + id));
@@ -45,7 +45,7 @@ public class BusController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Create a new bus")
+    @Operation(summary = "Create a new bus", description = "Create a new bus")
     public ResponseEntity<ApiResponse<BusResponse>> createBus(@Valid @RequestBody BusRequest request) {
         request.setProviderId(securityUtil.resolveEffectiveProviderId(request.getProviderId()));
         BusResponse response = busService.createBus(request);
@@ -55,7 +55,7 @@ public class BusController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Update bus by ID")
+    @Operation(summary = "Update bus by ID", description = "Update bus by ID")
     public ResponseEntity<ApiResponse<BusResponse>> updateBus(@PathVariable Long id,
                                                                @Valid @RequestBody BusRequest request) {
         assertOwnsBus(id);
@@ -66,7 +66,7 @@ public class BusController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Soft delete bus by ID")
+    @Operation(summary = "Soft delete bus by ID", description = "Soft delete bus by ID")
     public ResponseEntity<ApiResponse<MessageResponse>> deleteBus(@PathVariable Long id) {
         assertOwnsBus(id);
         busService.deleteBus(id);
@@ -77,3 +77,4 @@ public class BusController {
         securityUtil.resolveEffectiveProviderId(busService.getBusById(busId).getProviderId());
     }
 }
+

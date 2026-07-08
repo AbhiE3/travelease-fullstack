@@ -13,6 +13,9 @@ import com.travelease.backend.busbooking.service.BookingService;
 import com.travelease.backend.busbooking.service.CouponService;
 import com.travelease.backend.busbooking.service.RefundService;
 import com.travelease.backend.busbooking.service.SeatAllocationService;
+import com.travelease.backend.trip.entity.Trip;
+import com.travelease.backend.trip.repository.TripRepository;
+import com.travelease.backend.trip.security.TripAuthorizationService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +47,11 @@ public class BookingServiceImpl implements BookingService {
     private final SeatAllocationService seatAllocationService;
     private final CouponService couponService;
     private final RefundService refundService;
+    private final TripRepository tripRepository;
+    private final TripAuthorizationService tripAuthorizationService;
+
+    private static final Set<BookingStatus> TRIP_ATTACHABLE_STATUSES =
+            Set.of(BookingStatus.CONFIRMED, BookingStatus.COMPLETED);
 
     // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // CREATE BOOKING (backward-compatible: creates + auto-confirms)
@@ -791,5 +799,109 @@ public class BookingServiceImpl implements BookingService {
 
         CancellationPolicy policy = policies.get(0); // Most specific policy
         return booking.getTotalFare() * policy.getCancellationChargePercent() / 100.0;
+    }
+
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // TRAVELER TRIP INTEGRATION - attach/detach/list only
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    @Override
+    @Transactional
+    public TripBusBookingResponse attachBookingToTrip(UUID tripId, AttachBusBookingRequest request) {
+        Trip trip = getTrip(tripId);
+        requireTripAccess(trip);
+        tripAuthorizationService.requireMutableTrip(trip);
+
+        Booking booking = bookingRepository.findById(request.bookingId())
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", "id", request.bookingId()));
+        // Trip membership gives Trip access; booking ownership gives booking
+        // control. An organizer must not attach a fellow accepted member's
+        // booking merely because the trip is shared - both checks are required.
+        ensureOwnership(booking);
+
+        if (booking.getTravelerTripId() != null && booking.getTravelerTripId().equals(tripId)) {
+            // Already attached to this exact trip - idempotent, not an error.
+            return toTripBusBookingResponse(booking);
+        }
+        if (booking.getTravelerTripId() != null) {
+            throw new BookingException("Booking is already attached to a different trip");
+        }
+
+        ensureAttachableStatus(booking);
+
+        booking.setTravelerTripId(tripId);
+        bookingRepository.save(booking);
+        return toTripBusBookingResponse(booking);
+    }
+
+    @Override
+    @Transactional
+    public void removeBookingFromTrip(UUID tripId, Long bookingId) {
+        Trip trip = getTrip(tripId);
+        requireTripAccess(trip);
+        tripAuthorizationService.requireMutableTrip(trip);
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", "id", bookingId));
+        // Deliberately stricter than the Hotel Booking precedent: only the
+        // booking owner (or admin) may detach it. The trip organizer does NOT
+        // gain detach rights over a fellow accepted member's booking merely by
+        // being organizer - organizer status is a Trip-level authority, not a
+        // Booking-level one.
+        ensureOwnership(booking);
+
+        if (!tripId.equals(booking.getTravelerTripId())) {
+            throw new BookingException("Booking is not attached to trip " + tripId);
+        }
+
+        booking.setTravelerTripId(null);
+        bookingRepository.save(booking);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TripBusBookingSummaryResponse getTripBusBookings(UUID tripId) {
+        Trip trip = getTrip(tripId);
+        requireTripAccess(trip);
+
+        List<TripBusBookingResponse> bookings = bookingRepository.findByTravelerTripId(tripId).stream()
+                .map(this::toTripBusBookingResponse)
+                .toList();
+        double totalFare = bookings.stream().mapToDouble(TripBusBookingResponse::totalFare).sum();
+        return new TripBusBookingSummaryResponse(tripId, bookings.size(), totalFare, bookings);
+    }
+
+    private Trip getTrip(UUID tripId) {
+        return tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip", "id", tripId));
+    }
+
+    private void requireTripAccess(Trip trip) {
+        UUID currentUserId = securityUtil.getCurrentUserId();
+        boolean isAdmin = securityUtil.getCurrentUserRoles().contains("ROLE_ADMIN");
+        tripAuthorizationService.requireMember(trip, currentUserId, isAdmin);
+    }
+
+    private void ensureAttachableStatus(Booking booking) {
+        if (!TRIP_ATTACHABLE_STATUSES.contains(booking.getStatus())) {
+            throw new BookingException(
+                    "Booking status " + booking.getStatus() + " cannot be attached to a trip; "
+                            + "only CONFIRMED or COMPLETED bookings are eligible");
+        }
+    }
+
+    private TripBusBookingResponse toTripBusBookingResponse(Booking booking) {
+        return new TripBusBookingResponse(
+                booking.getId(),
+                booking.getBookingReference(),
+                booking.getStatus(),
+                booking.getTotalFare(),
+                booking.getSchedule().getId(),
+                booking.getSchedule().getTravelDate(),
+                booking.getSchedule().getRoute().getSource(),
+                booking.getSchedule().getRoute().getDestination(),
+                booking.getUserId(),
+                booking.getTravelerTripId()
+        );
     }
 }

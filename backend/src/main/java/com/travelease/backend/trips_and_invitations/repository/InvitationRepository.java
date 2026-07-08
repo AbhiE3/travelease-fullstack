@@ -15,4 +15,5 @@ public interface InvitationRepository extends JpaRepository<Invitation, UUID>{
 
     List<Invitation> findByTripId(UUID tripId);
 
+    boolean existsByTripIdAndInviteeEmail(UUID tripId, String inviteeEmail);
 }

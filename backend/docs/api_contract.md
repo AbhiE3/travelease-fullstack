@@ -20,6 +20,7 @@ Legend — **Auth:** `Public` / `Authenticated` (any logged-in user) / `Admin` (
 | GET | `/api/users/profile` | Authenticated | — | `UserResponse` | |
 | PUT | `/api/users/profile` | Authenticated | `UpdateUserRequest (name, phone, ...)` | `UserResponse` | Validation errors → 400 (US-AUTH-04). |
 | PUT | `/api/users/profile-picture` | Authenticated | multipart file | `UserResponse` | |
+| GET | `/api/users/search` | Authenticated | query: `q` | `List<UserResponse>` | Matches `ROLE_TRAVELER` users by name/email, capped at 10; blank/missing `q` → `[]`. Used by the invite-member typeahead. |
 
 ## Admin Management — Hotels & Destinations (US-ADMIN-01)
 

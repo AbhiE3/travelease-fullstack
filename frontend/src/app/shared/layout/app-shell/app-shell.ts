@@ -1,13 +1,13 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs';
 import { NgIcon } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
-
-export type Role = 'traveler' | 'admin' | 'hotel' | 'transport' | 'activity';
+import { Role, ROLE_HOME } from '@app/core/auth/auth.models';
+import { AuthService } from '@app/core/auth/auth.service';
 
 interface NavItem {
   to: string;
@@ -68,14 +68,6 @@ const ROLE_LABEL: Record<Role, string> = {
   activity: 'Activity Provider',
 };
 
-const ROLE_HOME: Record<Role, string> = {
-  traveler: '/dashboard',
-  admin: '/admin',
-  hotel: '/hotel',
-  transport: '/transport',
-  activity: '/activity',
-};
-
 @Component({
   selector: 'app-shell',
   imports: [
@@ -91,6 +83,8 @@ const ROLE_HOME: Record<Role, string> = {
 })
 export class AppShell {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   protected readonly role = toSignal(
     this.route.data.pipe(map((data) => (data['role'] as Role | undefined) ?? 'traveler')),
@@ -100,4 +94,9 @@ export class AppShell {
   protected readonly nav = computed(() => NAV_MAP[this.role()]);
   protected readonly roleLabel = computed(() => ROLE_LABEL[this.role()]);
   protected readonly home = computed(() => ROLE_HOME[this.role()]);
+
+  protected signOut(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

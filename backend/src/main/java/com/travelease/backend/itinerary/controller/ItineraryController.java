@@ -6,6 +6,8 @@ import com.travelease.backend.itinerary.service.ItineraryService;
 import com.travelease.backend.shared.exception.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -26,9 +28,11 @@ public class ItineraryController {
     // Create a new itinerary item
     // ─────────────────────────────────────────────────────
     @PostMapping
+    @PreAuthorize("hasAnyRole('TRAVELER','ADMIN')")
     public ResponseEntity<ItineraryResponse> addItem(
-            @RequestBody ItineraryRequest request) {
-        ItineraryResponse response = itineraryService.addItem(request);
+            @RequestBody ItineraryRequest request,
+            Authentication authentication) {
+        ItineraryResponse response = itineraryService.addItem(request, authentication.getName());
         return ResponseEntity.ok(response);
     }
 
@@ -41,10 +45,12 @@ public class ItineraryController {
     // Example: /api/itinerary?tripId=123&activityDate=2025-08-10
     // ─────────────────────────────────────────────────────
     @GetMapping
+    @PreAuthorize("hasAnyRole('TRAVELER','ADMIN')")
     public ResponseEntity<List<ItineraryResponse>> getItinerary(
             @RequestParam String tripId,
             @RequestParam(required = false) String activityDate,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String status,
+            Authentication authentication) {
 
         List<ItineraryResponse> response;
 
@@ -57,9 +63,9 @@ public class ItineraryController {
                         "activityDate must be in yyyy-MM-dd format: " + activityDate);
             }
             response = itineraryService
-                    .getByTripIdAndDate(tripId, date);
+                    .getByTripIdAndDate(tripId, date, authentication.getName());
         } else {
-            response = itineraryService.getByTripId(tripId);
+            response = itineraryService.getByTripId(tripId, authentication.getName());
         }
 
         // filter by status if provided
@@ -80,22 +86,26 @@ public class ItineraryController {
     // Send { "status": "Pending" }   to mark incomplete
     // ─────────────────────────────────────────────────────
     @PutMapping("/{itineraryId}")
+    @PreAuthorize("hasAnyRole('TRAVELER','ADMIN')")
     public ResponseEntity<ItineraryResponse> updateItem(
             @PathVariable String itineraryId,
-            @RequestBody ItineraryRequest request) {
+            @RequestBody ItineraryRequest request,
+            Authentication authentication) {
         ItineraryResponse response =
-                itineraryService.updateItem(itineraryId, request);
+                itineraryService.updateItem(itineraryId, request, authentication.getName());
         return ResponseEntity.ok(response);
     }
 
     // ─────────────────────────────────────────────────────
     // US-ITI-02 — DELETE /api/itinerary/{itineraryId}
-    // Remove an activity from the itinerary
+    // Remove an activity from the itinerary (organizer-only)
     // ─────────────────────────────────────────────────────
     @DeleteMapping("/{itineraryId}")
+    @PreAuthorize("hasAnyRole('TRAVELER','ADMIN')")
     public ResponseEntity<Map<String, String>> deleteItem(
-            @PathVariable String itineraryId) {
-        itineraryService.deleteItem(itineraryId);
+            @PathVariable String itineraryId,
+            Authentication authentication) {
+        itineraryService.deleteItem(itineraryId, authentication.getName());
         return ResponseEntity.ok(
                 Map.of("message",
                         "Itinerary item deleted successfully"));
@@ -107,10 +117,12 @@ public class ItineraryController {
     // Returns total, completed, pending, percentage
     // ─────────────────────────────────────────────────────
     @GetMapping("/progress")
+    @PreAuthorize("hasAnyRole('TRAVELER','ADMIN')")
     public ResponseEntity<Map<String, Object>> getProgress(
-            @RequestParam String tripId) {
+            @RequestParam String tripId,
+            Authentication authentication) {
         Map<String, Object> progress =
-                itineraryService.getProgress(tripId);
+                itineraryService.getProgress(tripId, authentication.getName());
         return ResponseEntity.ok(progress);
     }
 }

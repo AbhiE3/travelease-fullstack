@@ -1,6 +1,8 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideIcons } from '@ng-icons/core';
+import { authInterceptor } from '@app/core/auth/auth.interceptor';
 import {
   lucideActivity,
   lucideAlertTriangle,
@@ -18,6 +20,8 @@ import {
   lucideCheckCircle2,
   lucideClock,
   lucideDoorOpen,
+  lucideEye,
+  lucideEyeOff,
   lucideFileText,
   lucideHome,
   lucideHotel,
@@ -49,6 +53,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideClientHydration(withEventReplay()),
     provideIcons({
       lucideHome,
@@ -68,6 +73,8 @@ export const appConfig: ApplicationConfig = {
       lucideCheckCircle2,
       lucideClock,
       lucideDoorOpen,
+      lucideEye,
+      lucideEyeOff,
       lucideFileText,
       lucideHotel,
       lucideLayoutDashboard,

@@ -4,30 +4,34 @@
   </a>
 </app-page-header>
 
-<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-  @for (t of trips; track t.id) {
-    <a [routerLink]="['/trips', t.id]">
-      <div hlmCard class="overflow-hidden hover:shadow-[var(--shadow-elevated)] transition-shadow h-full">
-        <div class="relative h-40">
-          <img [src]="t.image" alt="" class="h-full w-full object-cover" />
-          <div class="absolute top-3 right-3"><app-status-badge [status]="t.status" /></div>
+@if (loading()) {
+  <p class="text-sm text-muted-foreground">Loading your trips…</p>
+} @else if (error()) {
+  <p class="text-sm text-destructive">{{ error() }}</p>
+} @else if (trips().length === 0) {
+  <p class="text-sm text-muted-foreground">No trips yet. Create your first one to get started.</p>
+} @else {
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+    @for (t of trips(); track t.tripId) {
+      <a [routerLink]="['/trips', t.tripId]">
+        <div hlmCard class="overflow-hidden hover:shadow-[var(--shadow-elevated)] transition-shadow h-full">
+          <div hlmCardContent class="pt-4 space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="font-semibold">{{ t.tripName }}</h3>
+              <app-status-badge [status]="t.status" />
+            </div>
+            <app-destination-pill [from]="t.sourceLocation" [to]="destinationLabel(t.destinationId)" />
+            <div class="flex items-center gap-3 text-xs text-muted-foreground">
+              <span>
+                <ng-icon name="lucideCalendar" class="inline h-3 w-3 mr-1" />{{ t.startDate }} – {{ t.endDate }}
+              </span>
+              <span>
+                <ng-icon name="lucideWallet" class="inline h-3 w-3 mr-1" />₹{{ t.budgetAmount.toLocaleString() }}
+              </span>
+            </div>
+          </div>
         </div>
-        <div hlmCardContent class="pt-4 space-y-3">
-          <div>
-            <h3 class="font-semibold">{{ t.name }}</h3>
-            <app-destination-pill [from]="t.source" [to]="t.destination" />
-          </div>
-          <div class="flex items-center gap-3 text-xs text-muted-foreground">
-            <span><ng-icon name="lucideCalendar" class="inline h-3 w-3 mr-1" />{{ t.startDate }}</span>
-            <span><ng-icon name="lucideUsers" class="inline h-3 w-3 mr-1" />{{ t.members }}</span>
-            <span><ng-icon name="lucideWallet" class="inline h-3 w-3 mr-1" />₹{{ t.budgetPerPerson.toLocaleString() }}/pp</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <hlm-progress [value]="t.progress" class="h-1.5"><hlm-progress-indicator /></hlm-progress>
-            <span class="text-xs text-muted-foreground tabular-nums">{{ t.progress }}%</span>
-          </div>
-        </div>
-      </div>
-    </a>
-  }
-</div>
+      </a>
+    }
+  </div>
+}

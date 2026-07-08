@@ -8,14 +8,17 @@
 
 <div hlmCard class="max-w-3xl">
   <div hlmCardContent class="pt-6">
-    <form class="grid grid-cols-1 md:grid-cols-2 gap-5" (submit)="onSubmit($event)">
+    <form
+      class="grid grid-cols-1 md:grid-cols-2 gap-5"
+      (submit)="onSubmit($event, nameInput.value, budgetInput.value, sourceInput.value, startDateInput.value, endDateInput.value)"
+    >
       <div class="md:col-span-2 space-y-2">
         <label hlmLabel for="name">Trip Name</label>
-        <input hlmInput id="name" placeholder="Goa Beach Escape" />
+        <input hlmInput id="name" placeholder="Goa Beach Escape" #nameInput />
       </div>
       <div class="space-y-2">
         <label hlmLabel>Trip Type</label>
-        <hlm-select [value]="'Friends'">
+        <hlm-select [value]="tripType()" (valueChange)="onTripTypeChange($event)">
           <hlm-select-trigger><hlm-select-value /></hlm-select-trigger>
           <ng-template hlmSelectPortal>
             <hlm-select-content>
@@ -27,40 +30,51 @@
         </hlm-select>
       </div>
       <div class="space-y-2">
-        <label hlmLabel for="budget">Budget per Person (₹)</label>
-        <input hlmInput id="budget" type="number" placeholder="18000" />
+        <label hlmLabel for="budget">Budget (₹)</label>
+        <input hlmInput id="budget" type="number" min="1" step="1" placeholder="18000" #budgetInput />
       </div>
       <div class="space-y-2">
         <label hlmLabel for="source">Source Location</label>
-        <input hlmInput id="source" placeholder="Bengaluru" />
+        <input hlmInput id="source" placeholder="Bengaluru" #sourceInput />
       </div>
       <div class="space-y-2">
-        <label hlmLabel for="destination">Destination</label>
-        <input hlmInput id="destination" placeholder="Goa" />
-      </div>
-      <div class="space-y-2 md:col-span-2">
-        <label hlmLabel>Preferred Area</label>
-        <hlm-select [value]="'Baga Beach'">
-          <hlm-select-trigger><hlm-select-value /></hlm-select-trigger>
-          <ng-template hlmSelectPortal>
-            <hlm-select-content>
-              @for (a of areas; track a) {
-                <hlm-select-item [value]="a">{{ a }}</hlm-select-item>
-              }
-            </hlm-select-content>
-          </ng-template>
-        </hlm-select>
+        <label hlmLabel>Destination</label>
+        @if (destinationsLoading()) {
+          <p class="text-xs text-muted-foreground py-2">Loading destinations…</p>
+        } @else if (destinationsError()) {
+          <p class="text-xs text-destructive py-2">Could not load destinations.</p>
+        } @else {
+          <hlm-select
+            [value]="selectedDestinationId()"
+            [itemToString]="destinationIdToLabel"
+            (valueChange)="onDestinationChange($event)"
+          >
+            <hlm-select-trigger><hlm-select-value /></hlm-select-trigger>
+            <ng-template hlmSelectPortal>
+              <hlm-select-content>
+                @for (d of destinations(); track d.destinationId) {
+                  <hlm-select-item [value]="d.destinationId.toString()">{{ destinationLabel(d) }}</hlm-select-item>
+                }
+              </hlm-select-content>
+            </ng-template>
+          </hlm-select>
+        }
       </div>
       <div class="space-y-2">
         <label hlmLabel for="start-date">Start Date</label>
-        <input hlmInput id="start-date" type="date" />
+        <input hlmInput id="start-date" type="date" #startDateInput />
       </div>
       <div class="space-y-2">
         <label hlmLabel for="end-date">End Date</label>
-        <input hlmInput id="end-date" type="date" />
+        <input hlmInput id="end-date" type="date" #endDateInput />
       </div>
+      @if (error()) {
+        <p class="md:col-span-2 text-xs text-destructive whitespace-pre-line">{{ error() }}</p>
+      }
       <div class="md:col-span-2 flex gap-3 pt-2">
-        <button hlmBtn type="submit">Create Trip</button>
+        <button hlmBtn type="submit" [disabled]="submitting() || destinationsLoading() || destinationsError()">
+          Create Trip
+        </button>
         <a hlmBtn variant="outline" routerLink="/trips">Cancel</a>
       </div>
     </form>

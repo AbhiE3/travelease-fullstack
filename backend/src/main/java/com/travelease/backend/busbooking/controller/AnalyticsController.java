@@ -27,7 +27,7 @@ public class AnalyticsController {
 
     @GetMapping("/dashboard")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get provider dashboard summary")
+    @Operation(summary = "Get provider dashboard summary", description = "Get provider dashboard summary")
     public ResponseEntity<ApiResponse<ProviderDashboardResponse>> getProviderDashboard(
             @RequestParam(required = false) Long providerId) {
         Long effectiveProviderId = securityUtil.resolveEffectiveProviderId(providerId);
@@ -39,7 +39,7 @@ public class AnalyticsController {
 
     @GetMapping("/buses")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get bus analytics for provider")
+    @Operation(summary = "Get bus analytics for provider", description = "Get bus analytics for provider")
     public ResponseEntity<ApiResponse<List<BusAnalyticsResponse>>> getBusAnalytics(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) String sort,
@@ -53,7 +53,7 @@ public class AnalyticsController {
 
     @GetMapping("/routes")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get route analytics for provider")
+    @Operation(summary = "Get route analytics for provider", description = "Get route analytics for provider")
     public ResponseEntity<ApiResponse<List<RouteAnalyticsResponse>>> getRouteAnalytics(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) String sort,
@@ -67,7 +67,7 @@ public class AnalyticsController {
 
     @GetMapping("/drivers")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get driver analytics for provider")
+    @Operation(summary = "Get driver analytics for provider", description = "Get driver analytics for provider")
     public ResponseEntity<ApiResponse<List<DriverAnalyticsResponse>>> getDriverAnalytics(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) String sort,
@@ -81,7 +81,7 @@ public class AnalyticsController {
 
     @GetMapping("/conductors")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get conductor analytics for provider")
+    @Operation(summary = "Get conductor analytics for provider", description = "Get conductor analytics for provider")
     public ResponseEntity<ApiResponse<List<ConductorAnalyticsResponse>>> getConductorAnalytics(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) String sort,
@@ -95,7 +95,7 @@ public class AnalyticsController {
 
     @GetMapping("/maintenance")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get maintenance analytics for provider")
+    @Operation(summary = "Get maintenance analytics for provider", description = "Get maintenance analytics for provider")
     public ResponseEntity<ApiResponse<MaintenanceAnalyticsResponse>> getMaintenanceAnalytics(
             @RequestParam(required = false) Long providerId) {
         Long effectiveProviderId = securityUtil.resolveEffectiveProviderId(providerId);
@@ -107,7 +107,7 @@ public class AnalyticsController {
 
     @GetMapping("/bookings")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get booking analytics for provider")
+    @Operation(summary = "Get booking analytics for provider", description = "Get booking analytics for provider")
     public ResponseEntity<ApiResponse<BookingAnalyticsResponse>> getBookingAnalytics(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -124,7 +124,7 @@ public class AnalyticsController {
 
     @GetMapping("/revenue")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Get revenue analytics for provider")
+    @Operation(summary = "Get revenue analytics for provider", description = "Get revenue analytics for provider")
     public ResponseEntity<ApiResponse<RevenueAnalyticsResponse>> getRevenueAnalytics(
             @RequestParam(required = false) Long providerId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -137,3 +137,4 @@ public class AnalyticsController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Revenue analytics fetched successfully", response, "/api/analytics/revenue"));
     }
 }
+

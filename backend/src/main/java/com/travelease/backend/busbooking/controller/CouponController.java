@@ -33,7 +33,7 @@ public class CouponController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create a coupon")
+    @Operation(summary = "Create a coupon", description = "Create a coupon")
     public ResponseEntity<ApiResponse<CouponResponse>> createCoupon(@Valid @RequestBody CouponRequest request) {
         CouponResponse response = couponService.createCoupon(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -42,7 +42,7 @@ public class CouponController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update a coupon")
+    @Operation(summary = "Update a coupon", description = "Update a coupon")
     public ResponseEntity<ApiResponse<CouponResponse>> updateCoupon(@PathVariable Long id,
                                                                      @Valid @RequestBody CouponRequest request) {
         CouponResponse response = couponService.updateCoupon(id, request);
@@ -51,21 +51,21 @@ public class CouponController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Deactivate a coupon")
+    @Operation(summary = "Deactivate a coupon", description = "Deactivate a coupon")
     public ResponseEntity<ApiResponse<Void>> deactivateCoupon(@PathVariable Long id) {
         couponService.deactivateCoupon(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Coupon deactivated successfully", null, "/api/coupons/" + id));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get coupon by ID")
+    @Operation(summary = "Get coupon by ID", description = "Get coupon by ID")
     public ResponseEntity<ApiResponse<CouponResponse>> getCouponById(@PathVariable Long id) {
         CouponResponse response = couponService.getCouponById(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Coupon fetched successfully", response, "/api/coupons/" + id));
     }
 
     @GetMapping
-    @Operation(summary = "Get coupons with optional filters")
+    @Operation(summary = "Get coupons with optional filters", description = "Get coupons with optional filters")
     public ResponseEntity<ApiResponse<List<CouponResponse>>> getCoupons(
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -79,7 +79,7 @@ public class CouponController {
     // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
     @GetMapping("/validate")
-    @Operation(summary = "Validate a coupon code")
+    @Operation(summary = "Validate a coupon code", description = "Validate a coupon code")
     public ResponseEntity<ApiResponse<CouponResponse>> validateCoupon(
             @RequestParam String code,
             @RequestParam(required = false) Double fareAmount,
@@ -95,7 +95,7 @@ public class CouponController {
 
     @PostMapping("/discounts")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create an automatic discount")
+    @Operation(summary = "Create an automatic discount", description = "Create an automatic discount")
     public ResponseEntity<ApiResponse<DiscountResponse>> createDiscount(@Valid @RequestBody DiscountRequest request) {
         DiscountResponse response = couponService.createDiscount(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -104,7 +104,7 @@ public class CouponController {
 
     @PutMapping("/discounts/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update an automatic discount")
+    @Operation(summary = "Update an automatic discount", description = "Update an automatic discount")
     public ResponseEntity<ApiResponse<DiscountResponse>> updateDiscount(@PathVariable Long id,
                                                                          @Valid @RequestBody DiscountRequest request) {
         DiscountResponse response = couponService.updateDiscount(id, request);
@@ -113,21 +113,21 @@ public class CouponController {
 
     @DeleteMapping("/discounts/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Deactivate an automatic discount")
+    @Operation(summary = "Deactivate an automatic discount", description = "Deactivate an automatic discount")
     public ResponseEntity<ApiResponse<Void>> deactivateDiscount(@PathVariable Long id) {
         couponService.deactivateDiscount(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Discount deactivated successfully", null, "/api/coupons/discounts/" + id));
     }
 
     @GetMapping("/discounts/{id}")
-    @Operation(summary = "Get discount by ID")
+    @Operation(summary = "Get discount by ID", description = "Get discount by ID")
     public ResponseEntity<ApiResponse<DiscountResponse>> getDiscountById(@PathVariable Long id) {
         DiscountResponse response = couponService.getDiscountById(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Discount fetched successfully", response, "/api/coupons/discounts/" + id));
     }
 
     @GetMapping("/discounts")
-    @Operation(summary = "Get discounts with optional filters")
+    @Operation(summary = "Get discounts with optional filters", description = "Get discounts with optional filters")
     public ResponseEntity<ApiResponse<List<DiscountResponse>>> getDiscounts(
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -136,3 +136,4 @@ public class CouponController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Discounts fetched successfully", response, "/api/coupons/discounts"));
     }
 }
+

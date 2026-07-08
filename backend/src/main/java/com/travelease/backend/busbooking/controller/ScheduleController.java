@@ -30,21 +30,21 @@ public class ScheduleController {
     private final com.travelease.backend.busbooking.security.SecurityUtil securityUtil;
 
     @GetMapping
-    @Operation(summary = "Get all schedules")
+    @Operation(summary = "Get all schedules", description = "Get all schedules")
     public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getAllSchedules() {
         List<ScheduleResponse> response = scheduleService.getAllSchedules();
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Schedules fetched successfully", response, "/api/schedules"));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get schedule by ID")
+    @Operation(summary = "Get schedule by ID", description = "Get schedule by ID")
     public ResponseEntity<ApiResponse<ScheduleResponse>> getScheduleById(@PathVariable Long id) {
         ScheduleResponse response = scheduleService.getScheduleById(id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Schedule fetched successfully", response, "/api/schedules/" + id));
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Search buses by source, destination, and travel date")
+    @Operation(summary = "Search buses by source, destination, and travel date", description = "Search buses by source, destination, and travel date")
     public ResponseEntity<ApiResponse<List<BusSearchResponse>>> searchBuses(
             @RequestParam String source,
             @RequestParam String destination,
@@ -55,7 +55,7 @@ public class ScheduleController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Create a new schedule")
+    @Operation(summary = "Create a new schedule", description = "Create a new schedule")
     public ResponseEntity<ApiResponse<ScheduleResponse>> createSchedule(@Valid @RequestBody ScheduleRequest request) {
         assertOwnsBus(request.getBusId());
         ScheduleResponse response = scheduleService.createSchedule(request);
@@ -65,7 +65,7 @@ public class ScheduleController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Update schedule by ID")
+    @Operation(summary = "Update schedule by ID", description = "Update schedule by ID")
     public ResponseEntity<ApiResponse<ScheduleResponse>> updateSchedule(@PathVariable Long id,
                                                                          @Valid @RequestBody ScheduleRequest request) {
         assertOwnsSchedule(id);
@@ -76,7 +76,7 @@ public class ScheduleController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROVIDER')")
-    @Operation(summary = "Cancel/delete schedule by ID")
+    @Operation(summary = "Cancel/delete schedule by ID", description = "Cancel/delete schedule by ID")
     public ResponseEntity<ApiResponse<MessageResponse>> deleteSchedule(@PathVariable Long id) {
         assertOwnsSchedule(id);
         scheduleService.deleteSchedule(id);
@@ -88,7 +88,7 @@ public class ScheduleController {
     // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
     @PostMapping("/search/advanced")
-    @Operation(summary = "Smart bus search with multi-filter, pagination, and dynamic sorting")
+    @Operation(summary = "Smart bus search with multi-filter, pagination, and dynamic sorting", description = "Smart bus search with multi-filter, pagination, and dynamic sorting")
     public ResponseEntity<ApiResponse<PaginatedSearchResponse<SmartSearchResponse>>> smartSearch(
             @Valid @RequestBody BusSearchCriteriaRequest criteria) {
         PaginatedSearchResponse<SmartSearchResponse> response = scheduleService.smartSearch(criteria);
@@ -97,7 +97,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/search/popular-routes")
-    @Operation(summary = "Get popular routes based on search frequency")
+    @Operation(summary = "Get popular routes based on search frequency", description = "Get popular routes based on search frequency")
     public ResponseEntity<ApiResponse<List<PopularRouteResponse>>> getPopularRoutes(
             @RequestParam(defaultValue = "10") int limit) {
         List<PopularRouteResponse> response = scheduleService.getPopularRoutes(limit);
@@ -106,7 +106,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/search/history")
-    @Operation(summary = "Get search history for current user (use sort=searchedAt,desc&size=5 for recent)")
+    @Operation(summary = "Get search history for current user (use sort=searchedAt,desc&size=5 for recent)", description = "Get search history for current user (use sort=searchedAt,desc&size=5 for recent)")
     public ResponseEntity<ApiResponse<List<SearchHistoryResponse>>> getSearchHistory(
             @PageableDefault(size = 20, sort = "searchedAt") Pageable pageable) {
         List<SearchHistoryResponse> response = scheduleService.getSearchHistory(pageable);
@@ -115,7 +115,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/search/suggestions")
-    @Operation(summary = "Get search suggestions based on previous bookings")
+    @Operation(summary = "Get search suggestions based on previous bookings", description = "Get search suggestions based on previous bookings")
     public ResponseEntity<ApiResponse<List<SearchSuggestionResponse>>> getSearchSuggestions(
             @RequestParam(defaultValue = "5") int limit) {
         List<SearchSuggestionResponse> response = scheduleService.getSearchSuggestions(limit);
@@ -124,7 +124,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/search/frequently-booked")
-    @Operation(summary = "Get frequently booked routes across all users")
+    @Operation(summary = "Get frequently booked routes across all users", description = "Get frequently booked routes across all users")
     public ResponseEntity<ApiResponse<List<PopularRouteResponse>>> getFrequentlyBookedRoutes(
             @RequestParam(defaultValue = "10") int limit) {
         List<PopularRouteResponse> response = scheduleService.getFrequentlyBookedRoutes(limit);
@@ -141,3 +141,4 @@ public class ScheduleController {
         securityUtil.resolveEffectiveProviderId(existing.getBus().getProviderId());
     }
 }
+

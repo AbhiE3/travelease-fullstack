@@ -4,6 +4,8 @@ import com.travelease.backend.expense.dto.CreateExpenseRequest;
 import com.travelease.backend.expense.dto.ExpenseResponse;
 import com.travelease.backend.expense.service.ExpenseService;
 import com.travelease.backend.shared.dto.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,11 +24,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/trips/{tripId}/expenses")
 @RequiredArgsConstructor
+@Tag(name = "Trip Expenses", description = "Shared expense endpoints for accepted trip members")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
 
     @PostMapping
+    @Operation(summary = "Create a shared expense", description = "ACCESS: AUTHENTICATED\nSCOPE: Accepted trip member only. Creates a trip expense and allocates shares to accepted trip participants.\nLIFECYCLE: Mutation is rejected once the Trip is COMPLETED or CANCELLED.\nIDENTITY: The current user is resolved from the JWT/email in the security context.")
     public ResponseEntity<ApiResponse<ExpenseResponse>> createSharedExpense(
             @PathVariable UUID tripId,
             @Valid @RequestBody CreateExpenseRequest request,
@@ -38,6 +42,7 @@ public class ExpenseController {
     }
 
     @GetMapping
+    @Operation(summary = "List trip expenses", description = "ACCESS: AUTHENTICATED\nSCOPE: Accepted trip member only. Returns expenses recorded on the trip.\nIDENTITY: The current user is resolved from the JWT/email in the security context.")
     public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getTripExpenses(
             @PathVariable UUID tripId,
             Authentication authentication
@@ -47,6 +52,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/{expenseId}")
+    @Operation(summary = "Get trip expense by ID", description = "ACCESS: AUTHENTICATED\nSCOPE: Accepted trip member only. Returns a specific expense that belongs to the trip.\nIDENTITY: The current user is resolved from the JWT/email in the security context.")
     public ResponseEntity<ApiResponse<ExpenseResponse>> getTripExpense(
             @PathVariable UUID tripId,
             @PathVariable UUID expenseId,

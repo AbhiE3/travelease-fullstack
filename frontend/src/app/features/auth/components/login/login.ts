@@ -1,48 +1,52 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { NgIcon } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
-
-interface RoleCredential {
-  username: string;
-  password: string;
-  route: string;
-}
-
-const ROLE_CREDENTIALS: RoleCredential[] = [
-  { username: 'user', password: 'user123', route: '/dashboard' },
-  { username: 'admin', password: 'admin123', route: '/admin' },
-  { username: 'hotel', password: 'hotel123', route: '/hotel' },
-  { username: 'bus', password: 'bus123', route: '/transport' },
-  { username: 'activity', password: 'activity123', route: '/activity' },
-];
-
-export function matchRole(username: string, password: string): string | null {
-  const match = ROLE_CREDENTIALS.find(
-    (c) => c.username === username && c.password === password,
-  );
-  return match ? match.route : null;
-}
+import { AuthService } from '@app/core/auth/auth.service';
+import { ROLE_HOME } from '@app/core/auth/auth.models';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, HlmButtonImports, HlmInputImports, HlmLabelImports],
+  imports: [RouterLink, NgIcon, HlmButtonImports, HlmInputImports, HlmLabelImports],
   templateUrl: './login.html',
 })
 export class Login {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   protected readonly error = signal<string | null>(null);
+  protected readonly submitting = signal(false);
+  protected readonly passwordVisible = signal(false);
 
-  protected onSubmit(event: Event, username: string, password: string): void {
+  constructor() {
+    const role = this.authService.isAuthenticated() ? this.authService.role() : null;
+    if (role) {
+      this.router.navigate([ROLE_HOME[role]]);
+    }
+  }
+
+  protected togglePasswordVisibility(): void {
+    this.passwordVisible.update((visible) => !visible);
+  }
+
+  protected async onSubmit(event: Event, email: string, password: string): Promise<void> {
     event.preventDefault();
-    const route = matchRole(username, password);
-    if (route) {
-      this.error.set(null);
-      this.router.navigate([route]);
-    } else {
-      this.error.set('Invalid username or password');
+    this.error.set(null);
+    this.submitting.set(true);
+    try {
+      const user = await this.authService.login(email, password);
+      this.router.navigate([ROLE_HOME[user.role]]);
+    } catch (err) {
+      this.error.set(
+        err instanceof HttpErrorResponse
+          ? (err.error?.error?.message ?? 'Invalid email or password')
+          : 'Something went wrong. Please try again.',
+      );
+    } finally {
+      this.submitting.set(false);
     }
   }
 }

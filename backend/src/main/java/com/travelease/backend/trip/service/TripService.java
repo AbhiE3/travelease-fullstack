@@ -1,24 +1,37 @@
 package com.travelease.backend.trip.service;
 
-import java.util.UUID;
+import com.travelease.backend.trip.dto.AddTripMemberRequest;
+import com.travelease.backend.trip.dto.CreateTripRequest;
+import com.travelease.backend.trip.dto.PendingInvitationResponse;
+import com.travelease.backend.trip.dto.TripMemberResponse;
+import com.travelease.backend.trip.dto.TripResponse;
+import com.travelease.backend.trip.dto.TripStatusTransitionRequest;
+import com.travelease.backend.trip.dto.UpdateTripRequest;
 
-import com.travelease.backend.trip.request.CreateTripRequest;
-import com.travelease.backend.trip.request.UpdateTripRequest;
-import com.travelease.backend.trip.response.TripDashboardResponse;
-import com.travelease.backend.trip.response.TripResponse;
+import java.util.List;
+import java.util.UUID;
 
 public interface TripService {
 
-    // US-TRIP-01 Create Trip
-    TripResponse createTrip(CreateTripRequest request);
+    TripResponse createTrip(CreateTripRequest request, String currentUserEmail);
 
-    // US-TRIP-02 & US-TRIP-03 Modify Trip / Change Category
-    TripResponse updateTrip(UUID tripId, UpdateTripRequest request);
+    List<TripResponse> getMyTrips(String currentUserEmail);
 
-    // US-TRIP-04 Cancel Trip
-    TripResponse cancelTrip(UUID tripId);
+    TripResponse getTripById(UUID tripId, String currentUserEmail);
 
-    // US-TRIP-05 View Dashboard
-    TripDashboardResponse getTripDashboard(UUID tripId);
+    TripResponse updateTrip(UUID tripId, UpdateTripRequest request, String currentUserEmail);
 
+    TripResponse transitionStatus(UUID tripId, TripStatusTransitionRequest request, String currentUserEmail);
+
+    List<TripMemberResponse> getTripMembers(UUID tripId, String currentUserEmail);
+
+    TripMemberResponse addTripMember(UUID tripId, AddTripMemberRequest request, String currentUserEmail);
+
+    void removeTripMember(UUID tripId, UUID tripMemberId, String currentUserEmail);
+
+    TripMemberResponse acceptTripMemberInvitation(UUID tripId, UUID tripMemberId, String currentUserEmail);
+
+    TripMemberResponse rejectTripMemberInvitation(UUID tripId, UUID tripMemberId, String currentUserEmail);
+
+    List<PendingInvitationResponse> getMyPendingInvitations(String currentUserEmail);
 }

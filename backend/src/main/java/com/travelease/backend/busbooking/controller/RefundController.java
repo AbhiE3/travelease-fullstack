@@ -38,7 +38,7 @@ public class RefundController {
     private final SecurityUtil securityUtil;
 
     @GetMapping
-    @Operation(summary = "Get refunds with optional filters")
+    @Operation(summary = "Get refunds with optional filters", description = "Get refunds with optional filters")
     public ResponseEntity<ApiResponse<List<RefundResponse>>> getRefunds(
             @RequestParam(required = false) String reference,
             @RequestParam(required = false) Long bookingId,
@@ -54,7 +54,7 @@ public class RefundController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get refund by ID")
+    @Operation(summary = "Get refund by ID", description = "Get refund by ID")
     public ResponseEntity<ApiResponse<RefundResponse>> getRefundById(@PathVariable Long id) {
         RefundResponse response = refundService.getRefundById(id);
         bookingService.getBookingById(response.getBookingId()); // ownership check side effect
@@ -63,7 +63,7 @@ public class RefundController {
 
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Transition refund status (process/approve/complete/reject/fail)")
+    @Operation(summary = "Transition refund status (process/approve/complete/reject/fail)", description = "Transition refund status (process/approve/complete/reject/fail)")
     public ResponseEntity<ApiResponse<RefundResponse>> transitionRefundStatus(
             @PathVariable Long id,
             @Valid @RequestBody RefundStatusTransitionRequest request) {
@@ -71,3 +71,4 @@ public class RefundController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Refund status updated successfully", response, "/api/refunds/" + id + "/status"));
     }
 }
+

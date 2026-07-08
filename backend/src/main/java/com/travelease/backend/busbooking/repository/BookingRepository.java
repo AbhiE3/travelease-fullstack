@@ -23,6 +23,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
 
     List<Booking> findByScheduleId(Long scheduleId);
 
+    List<Booking> findByTravelerTripId(UUID travelerTripId);
+
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.status = :status")
     Long countByStatus(@Param("status") com.travelease.backend.busbooking.entity.enums.BookingStatus status);
 

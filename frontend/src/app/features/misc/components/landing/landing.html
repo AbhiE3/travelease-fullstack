@@ -1,54 +1,371 @@
-<div class="min-h-screen bg-background">
-  <header class="border-b">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a routerLink="/" class="flex items-center gap-2 font-semibold">
-        <div class="h-9 w-9 rounded-lg bg-primary text-primary-foreground grid place-items-center font-bold">
-          T
-        </div>
-        TravelEase
-      </a>
-      <div class="flex items-center gap-3">
-        <a hlmBtn variant="ghost" routerLink="/login">Sign in</a>
-        <a hlmBtn routerLink="/register">Get started</a>
+<main class="landing-page">
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="logo">
+        <img src="/images/logo.png" alt="TravelEase logo" class="logo-img" />
+        <span>TravelEase</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#journey">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-right">
+        <a routerLink="/login">Sign in</a>
+        <a class="btn btn-primary" routerLink="/register">Get started →</a>
       </div>
     </div>
   </header>
 
-  <section class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
-    <div>
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-5">
-        <ng-icon name="lucidePlane" class="h-3.5 w-3.5" /> Collaborative trip OS
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="badge"><span class="dot"></span> Personalized itinerary suggestions</div>
+        <h1>Plan group trips <span class="hl">end-to-end</span>, without the chaos.</h1>
+        <p class="lead">One workspace for invitations, bus seats, accommodations, expenses, itineraries and live disruption handling — for travelers, hotels, transport and activity partners.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" routerLink="/dashboard">Open dashboard</a>
+          <a class="btn btn-ghost" href="#journey">▶ See admin console</a>
+        </div>
+        <div class="hero-proof">
+          <div class="avatars"><span></span><span></span><span></span><span></span></div>
+          <div>
+            <div class="stars">★★★★★</div>
+            <div class="proof-text">4.9 from 1,200+ trip organizers</div>
+          </div>
+        </div>
       </div>
-      <h1 class="text-5xl font-semibold tracking-tight text-foreground leading-[1.05]">
-        Plan group trips end-to-end, without the chaos.
-      </h1>
-      <p class="mt-5 text-lg text-muted-foreground max-w-xl">
-        TravelEase brings invitations, bus seats, accommodations, expenses, itineraries and
-        disruption alerts into one calm dashboard.
-      </p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a hlmBtn size="lg" routerLink="/dashboard">
-          Open dashboard <ng-icon name="lucideArrowRight" class="ml-1 h-4 w-4" />
-        </a>
-        <a hlmBtn size="lg" variant="outline" routerLink="/admin">Admin console</a>
+
+      <div class="hero-visual">
+        <div class="photo-card"></div>
+
+        <div class="float-card card-bus">
+          <div class="row1"><span class="ico">🚌</span> Volvo A9 · 42 seats</div>
+          <div class="sub">Bangalore → Goa</div>
+          <div class="seatmap">
+            <div></div><div class="on"></div><div></div><div class="on2"></div><div></div><div></div>
+            <div class="on"></div><div></div><div></div><div class="on"></div><div class="on2"></div><div></div>
+            <div></div><div></div><div class="on"></div><div></div><div></div><div class="on"></div>
+          </div>
+          <div class="foot"><span class="ok">✓ 8 seats reserved</span><span>2h ago</span></div>
+        </div>
+
+        <div class="float-card card-budget">
+          <div class="top"><span>Trip budget</span><span class="amt">₹1,20,000</span></div>
+          <div class="budgetbar"><div></div><div></div><div></div><div></div></div>
+          <div class="budget-cols">
+            <div><b>32%</b>Transport</div>
+            <div><b>24%</b>Stays</div>
+            <div><b>12%</b>Food</div>
+          </div>
+        </div>
+
+        <div class="float-card card-alert">
+          <div class="row1">
+            <span class="ico">!</span>
+            <div>
+              <b>Bus delayed 45 min</b>
+              <p>Auto‑nudged hotel check‑in · 8 members notified</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="rounded-2xl overflow-hidden shadow-[var(--shadow-elevated)] border bg-card">
-      <img
-        src="/images/landing-hero.jpg"
-        alt="Group trip"
-        class="w-full h-[420px] object-cover"
-      />
     </div>
   </section>
 
-  <section class="max-w-7xl mx-auto px-6 pb-20 grid md:grid-cols-4 gap-4">
-    @for (f of features; track f.title) {
-      <div class="p-5 rounded-xl border bg-card">
-        <ng-icon [name]="f.icon" class="h-5 w-5 text-primary mb-3" />
-        <div class="font-medium">{{ f.title }}</div>
-        <p class="text-sm text-muted-foreground mt-1">{{ f.desc }}</p>
+  <div class="trust">
+    <div class="wrap trust-inner">
+      <div class="trust-label">Trusted by teams and partners at</div>
+      <div class="trust-logos">
+        <span>Redbus</span><span>Oyo</span><span>MakeMyTrip</span><span>Zostel</span><span>Yatra</span><span>Booking</span><span>GoAir</span><span>IRCTC</span>
       </div>
-    }
+    </div>
+  </div>
+
+  <section id="roles">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">One platform · Five roles</div>
+        <h2>A calm workspace for every stakeholder</h2>
+        <p>TravelEase connects travelers with hotels, transport and activity partners — orchestrated by a central admin.</p>
+      </div>
+      <div class="roles-grid">
+        <div class="role-card">
+          <div class="role-ico">👥</div>
+          <h3>Travelers</h3>
+          <p>Plan, invite, split, review.</p>
+          <a class="explore" href="#">Explore →</a>
+        </div>
+        <div class="role-card">
+          <div class="role-ico">🏨</div>
+          <h3>Hotel partners</h3>
+          <p>Rooms, allocations, reviews.</p>
+          <a class="explore" href="#">Explore →</a>
+        </div>
+        <div class="role-card">
+          <div class="role-ico">🚌</div>
+          <h3>Transport partners</h3>
+          <p>Fleet, routes, bookings.</p>
+          <a class="explore" href="#">Explore →</a>
+        </div>
+        <div class="role-card">
+          <div class="role-ico">🎟</div>
+          <h3>Activity providers</h3>
+          <p>Slots, capacity, payouts.</p>
+          <a class="explore" href="#">Explore →</a>
+        </div>
+        <div class="role-card">
+          <div class="role-ico">🛡</div>
+          <h3>Admin console</h3>
+          <p>Approvals, funnel, analytics.</p>
+          <a class="explore" href="#">Explore →</a>
+        </div>
+      </div>
+    </div>
   </section>
-</div>
+
+  <section id="features" class="features-section">
+    <div class="wrap">
+      <div class="feat-tag">Everything in one place</div>
+      <h2 class="feat-head">The trip solution your spreadsheets keep failing to be</h2>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-ico">👥</div>
+          <h3>Invite & coordinate</h3>
+          <p>Roles, RSVPs, group chat, in‑context nudges.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">🚌</div>
+          <h3>Book together</h3>
+          <p>Adjacent seats, negotiated group hotel blocks.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">💳</div>
+          <h3>Split expenses</h3>
+          <p>Splitwise‑style settlements with instant balances.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">🛡</div>
+          <h3>Disruptions handled</h3>
+          <p>Live delays, rebookings, hotel re‑timing.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">📍</div>
+          <h3>Smart itineraries</h3>
+          <p>Drag‑drop days, personalised suggestions, offline mode.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">📈</div>
+          <h3>Live budgets</h3>
+          <p>Category caps and alerts before you overspend.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="journey" class="journey">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow journey-tag">The traveler journey</div>
+        <h2>From "let's go somewhere" to "same time next year"</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">🚀</div>
+          <div class="lbl">Step 1</div>
+          <h3>Create & invite</h3>
+          <p>Spin up a trip, invite members with a link.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">🚌</div>
+          <div class="lbl">Step 2</div>
+          <h3>Book transport</h3>
+          <p>Compare buses, lock adjacent seats together.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">🏨</div>
+          <div class="lbl">Step 3</div>
+          <h3>Reserve stays</h3>
+          <p>Allocate rooms, roommates in seconds.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">🗓</div>
+          <div class="lbl">Step 4</div>
+          <h3>Build itinerary</h3>
+          <p>Days, activities, breaks — no more chats.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">📊</div>
+          <div class="lbl">Step 5</div>
+          <h3>Track expenses</h3>
+          <p>Log & split as you go, settle in one tap.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">⭐</div>
+          <div class="lbl">Step 6</div>
+          <h3>Review & repeat</h3>
+          <p>Rate partners, save trips as templates.</p>
+        </div>
+      </div>
+      <div class="wrap" style="padding:0;margin-top:56px;">
+        <div class="stats">
+          <div><div class="num">1,200+</div><div class="lbl">Trip organizers</div></div>
+          <div><div class="num">18k</div><div class="lbl">Travelers moved</div></div>
+          <div><div class="num">₹42 Cr</div><div class="lbl">Expenses settled</div></div>
+          <div><div class="num">99.2%</div><div class="lbl">Disruptions resolved</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="testimonials">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Loved by trip planners</div>
+        <h2>Groups don't fall apart anymore</h2>
+      </div>
+      <div class="test-grid">
+        <div class="test-card">
+          <div class="stars">★★★★★</div>
+          <p class="quote">"We planned a 22‑person Ladakh trip without a single WhatsApp poll."</p>
+          <div class="who"><span class="av"></span><div><b>Ananya R.</b><span>Trip organizer</span></div></div>
+        </div>
+        <div class="test-card">
+          <div class="stars">★★★★★</div>
+          <p class="quote">"The disruption handling saved us on a delayed bus — hotel auto re‑timed."</p>
+          <div class="who"><span class="av"></span><div><b>Karthik M.</b><span>Group lead</span></div></div>
+        </div>
+        <div class="test-card">
+          <div class="stars">★★★★★</div>
+          <p class="quote">"Settlement in one tap. Nobody argues about that ₹230 chai anymore."</p>
+          <div class="who"><span class="av"></span><div><b>Priya S.</b><span>Traveler</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="pricing-section">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Simple pricing</div>
+        <h2>Free for travelers. Fair for partners.</h2>
+      </div>
+      <div class="price-grid">
+        <div class="price-card">
+          <div class="price-name">Explorer</div>
+          <div class="price-amt">Free</div>
+          <p class="price-desc">For casual trips up to 6 members.</p>
+          <ul class="price-feats">
+            <li><span class="check">✓</span> Unlimited trips</li>
+            <li><span class="check">✓</span> Bus & hotel search</li>
+            <li><span class="check">✓</span> Basic splits</li>
+          </ul>
+          <a class="btn btn-outline" href="#">Start free</a>
+        </div>
+        <div class="price-card pop">
+          <div class="pop-tag">Most popular</div>
+          <div class="price-name">Crew</div>
+          <div class="price-amt">₹299<sup>/mo</sup></div>
+          <p class="price-desc">For frequent groups and clubs.</p>
+          <ul class="price-feats">
+            <li><span class="check">✓</span> Everything in Explorer</li>
+            <li><span class="check">✓</span> Advanced settlements</li>
+            <li><span class="check">✓</span> Disruption automations</li>
+            <li><span class="check">✓</span> Priority support</li>
+          </ul>
+          <a class="btn btn-primary" style="width:100%;justify-content:center;" href="#">Try Crew</a>
+        </div>
+        <div class="price-card">
+          <div class="price-name">Partner</div>
+          <div class="price-amt">Custom</div>
+          <p class="price-desc">For hotels, transport & activities.</p>
+          <ul class="price-feats">
+            <li><span class="check">✓</span> Dedicated dashboard</li>
+            <li><span class="check">✓</span> Bulk inventory</li>
+            <li><span class="check">✓</span> Analytics & payouts</li>
+          </ul>
+          <a class="btn btn-outline" href="#">Talk to us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Answers</div>
+        <h2>Frequently asked</h2>
+      </div>
+      <div class="faq">
+        <div class="faq-item" [class.open]="faqOpen() === 0">
+          <button class="faq-q" type="button" (click)="toggleFaq(0)">
+            Is TravelEase free for travelers? <span class="chev">›</span>
+          </button>
+          <div class="faq-a"><p>Yes. The Explorer plan is free for trips up to 6 members, with unlimited trips, basic search and simple expense splitting.</p></div>
+        </div>
+        <div class="faq-item" [class.open]="faqOpen() === 1">
+          <button class="faq-q" type="button" (click)="toggleFaq(1)">
+            Can partners onboard their own inventory? <span class="chev">›</span>
+          </button>
+          <div class="faq-a"><p>Hotel, transport and activity partners get a dedicated dashboard to list rooms, seats and slots, and manage payouts directly.</p></div>
+        </div>
+        <div class="faq-item" [class.open]="faqOpen() === 2">
+          <button class="faq-q" type="button" (click)="toggleFaq(2)">
+            How are expenses split? <span class="chev">›</span>
+          </button>
+          <div class="faq-a"><p>Every expense is logged against the trip and split Splitwise‑style, with running balances so settlement is one tap.</p></div>
+        </div>
+        <div class="faq-item" [class.open]="faqOpen() === 3">
+          <button class="faq-q" type="button" (click)="toggleFaq(3)">
+            What happens on a disruption? <span class="chev">›</span>
+          </button>
+          <div class="faq-a"><p>Delays and cancellations trigger automatic re‑timing of hotel check‑ins and live notifications to every member on the trip.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta" class="cta-section">
+    <div class="wrap">
+      <div class="cta-band">
+        <h2>Ready for calmer group trips?</h2>
+        <p>Start free, invite your crew, and let TravelEase handle the rest.</p>
+        <a class="btn btn-primary" href="#pricing">Get started — free</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <div class="logo"><span class="logo-mark">✈</span>TravelEase</div>
+          <p>The collaborative operating system for group travel.</p>
+        </div>
+        <div class="foot-col">
+          <h4>Product</h4>
+          <a href="#">Traveler</a>
+          <a href="#">Hotel</a>
+          <a href="#">Transport</a>
+          <a href="#">Activities</a>
+        </div>
+        <div class="foot-col">
+          <h4>Company</h4>
+          <a href="#">Admin</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="foot-col">
+          <h4>Account</h4>
+          <a routerLink="/login">Sign in</a>
+          <a class="btn btn-primary" href="#">Get started</a>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 TravelEase. All rights reserved.</span>
+        <span>Made for calmer group trips.</span>
+      </div>
+    </div>
+  </footer>
+</main>

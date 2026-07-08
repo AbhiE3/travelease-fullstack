@@ -10,4 +10,6 @@ public interface ActivityRepository
         extends JpaRepository<Activity, String> {
 
     List<Activity> findByDestinationId(Integer destinationId);
+
+    List<Activity> findByProviderId(Long providerId);
 }

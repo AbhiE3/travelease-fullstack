@@ -1,22 +1,43 @@
+<div class="flex justify-center mb-6">
+  <img src="/images/logo.png" alt="TravelEase logo" class="h-12 w-12 rounded-lg object-cover" />
+</div>
 <h1 class="text-2xl font-semibold tracking-tight">Welcome back</h1>
-<p class="text-sm text-muted-foreground mt-1 mb-6">Sign in to manage your trips and travel plans.</p>
+<p class="text-sm text-muted-foreground mt-1 mb-6">
+  Sign in to your personalised TravelEase dashboard and manage every group trip in one place.
+</p>
 
-<form class="space-y-4" (submit)="onSubmit($event, usernameInput.value, passwordInput.value)">
+<form class="space-y-4" (submit)="onSubmit($event, emailInput.value, passwordInput.value)">
   <div class="space-y-2">
-    <label hlmLabel for="username">Username</label>
-    <input hlmInput id="username" type="text" placeholder="e.g. admin" #usernameInput />
+    <label hlmLabel for="email">Email</label>
+    <input hlmInput id="email" type="email" placeholder="e.g. admin@travelease.test" #emailInput />
   </div>
   <div class="space-y-2">
     <div class="flex items-center justify-between">
       <label hlmLabel for="password">Password</label>
       <a routerLink="/login" class="text-xs text-primary">Forgot password?</a>
     </div>
-    <input hlmInput id="password" type="password" placeholder="••••••••" #passwordInput />
+    <div class="relative">
+      <input
+        hlmInput
+        id="password"
+        [type]="passwordVisible() ? 'text' : 'password'"
+        placeholder="••••••••"
+        #passwordInput
+      />
+      <button
+        type="button"
+        class="absolute inset-y-0 right-3 inline-flex items-center justify-center rounded-full bg-surface px-2 text-muted-foreground hover:text-foreground"
+        aria-label="Toggle password visibility"
+        (click)="togglePasswordVisibility()"
+      >
+        <ng-icon [name]="passwordVisible() ? 'lucideEyeOff' : 'lucideEye'" class="h-4 w-4" />
+      </button>
+    </div>
   </div>
   @if (error()) {
     <p class="text-xs text-destructive">{{ error() }}</p>
   }
-  <button hlmBtn type="submit" class="w-full">Sign in</button>
+  <button hlmBtn type="submit" class="w-full" [disabled]="submitting()">Sign in</button>
 </form>
 
 <p class="text-sm text-muted-foreground mt-6 text-center">

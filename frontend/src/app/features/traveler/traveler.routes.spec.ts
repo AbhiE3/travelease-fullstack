@@ -1,4 +1,5 @@
 import { AppShell } from '@app/shared/layout/app-shell/app-shell';
+import { authGuard } from '@app/core/auth/auth.guard';
 import { TRAVELER_ROUTES } from './traveler.routes';
 
 describe('TRAVELER_ROUTES', () => {
@@ -7,6 +8,7 @@ describe('TRAVELER_ROUTES', () => {
     const shellRoute = TRAVELER_ROUTES[0];
     expect(shellRoute.path).toBe('');
     expect(shellRoute.data?.['role']).toBe('traveler');
+    expect(shellRoute.canActivate).toEqual([authGuard]);
     const loaded = await shellRoute.loadComponent!();
     expect(loaded).toBe(AppShell);
   });

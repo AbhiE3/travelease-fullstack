@@ -1,4 +1,5 @@
 import { AppShell } from '@app/shared/layout/app-shell/app-shell';
+import { authGuard } from '@app/core/auth/auth.guard';
 import { ActivityDashboard } from '@app/features/activity/components/activity-dashboard/activity-dashboard';
 import { ManageActivities } from '@app/features/activity/components/manage-activities/manage-activities';
 import { ActivityBookings } from '@app/features/activity/components/activity-bookings/activity-bookings';
@@ -12,6 +13,7 @@ describe('ACTIVITY_ROUTES', () => {
     const shellRoute = ACTIVITY_ROUTES[0];
     expect(shellRoute.path).toBe('');
     expect(shellRoute.data?.['role']).toBe('activity');
+    expect(shellRoute.canActivate).toEqual([authGuard]);
     const loaded = await shellRoute.loadComponent!();
     expect(loaded).toBe(AppShell);
   });
