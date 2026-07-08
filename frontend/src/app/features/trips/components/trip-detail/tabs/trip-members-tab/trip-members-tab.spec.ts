@@ -6,6 +6,7 @@ import { Subject, of, throwError } from 'rxjs';
 import { TripMembersTab } from '@app/features/trips/components/trip-detail/tabs/trip-members-tab/trip-members-tab';
 import { TripsService } from '@app/features/trips/services/trips.service';
 import { TripMember } from '@app/features/trips/services/trip.models';
+import { UsersService } from '@app/core/users/users.service';
 
 const TRIP_ID = 'aaaaaaaa-0000-0000-0000-000000000001';
 
@@ -29,6 +30,7 @@ async function setup(tripsService: Partial<TripsService>) {
       provideIcons({ lucideUserPlus }),
       { provide: ActivatedRoute, useValue: { paramMap: of(new Map([['tripId', TRIP_ID]])) } },
       { provide: TripsService, useValue: tripsService },
+      { provide: UsersService, useValue: { searchTravelers: () => of([]) } },
     ],
   }).compileComponents();
   const fixture = TestBed.createComponent(TripMembersTab);

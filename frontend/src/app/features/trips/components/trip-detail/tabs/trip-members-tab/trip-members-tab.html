@@ -10,16 +10,40 @@
           <div hlmDialogHeader>
             <h3 hlmDialogTitle>Invite a member</h3>
           </div>
-          <form class="space-y-3" (submit)="onInvite($event, emailInput.value)">
+          <form class="space-y-3" (submit)="onInvite($event, selectedMember()?.email ?? '')">
             <div class="space-y-2">
-              <label hlmLabel for="invite-email">Email</label>
-              <input hlmInput id="invite-email" placeholder="friend@example.com" #emailInput />
+              <label hlmLabel for="invite-member-search">Traveler</label>
+              <hlm-autocomplete
+                [(value)]="selectedMember"
+                [(search)]="memberQuery"
+                [itemToString]="memberToString"
+                [isItemEqualToValue]="isSameMember"
+              >
+                <hlm-autocomplete-input
+                  [inputId]="'invite-member-search'"
+                  placeholder="Search by name or email"
+                />
+                <ng-template hlmAutocompletePortal>
+                  <hlm-autocomplete-content>
+                    <div hlmAutocompleteList>
+                      @if (memberSearching()) {
+                        <hlm-autocomplete-status>Searching…</hlm-autocomplete-status>
+                      } @else {
+                        @for (m of memberResults(); track m.id) {
+                          <hlm-autocomplete-item [value]="m">{{ m.name }} ({{ m.email }})</hlm-autocomplete-item>
+                        }
+                        <hlm-autocomplete-empty>No matching travelers</hlm-autocomplete-empty>
+                      }
+                    </div>
+                  </hlm-autocomplete-content>
+                </ng-template>
+              </hlm-autocomplete>
             </div>
             @if (inviteError()) {
               <p class="text-xs text-destructive">{{ inviteError() }}</p>
             }
             <div hlmDialogFooter>
-              <button hlmBtn type="submit" [disabled]="inviting()">Send Invite</button>
+              <button hlmBtn type="submit" [disabled]="inviting() || !selectedMember()">Send Invite</button>
             </div>
           </form>
         </hlm-dialog-content>
