@@ -44,6 +44,12 @@ public class ProviderAccommodationController {
         return ResponseEntity.ok(ApiResponse.success(response, "Provider hotels retrieved"));
     }
 
+    @GetMapping("/hotel-bookings")
+    public ResponseEntity<ApiResponse<List<HotelBookingResponse>>> bookings() {
+        List<HotelBookingResponse> response = accommodationService.getProviderBookings();
+        return ResponseEntity.ok(ApiResponse.success(response, "Provider hotel bookings retrieved"));
+    }
+
     @GetMapping("/hotels/{hotelId}")
     public ResponseEntity<ApiResponse<HotelDetailsResponse>> hotelDetails(@PathVariable UUID hotelId) {
         HotelDetailsResponse response = accommodationService.getHotelDetails(hotelId);

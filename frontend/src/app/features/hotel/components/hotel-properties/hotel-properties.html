@@ -1,8 +1,181 @@
 <app-page-header title="My Hotels" subtitle="Properties you manage on TravelEase.">
-  <button hlmBtn action>
-    <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Property
-  </button>
+  <hlm-dialog [state]="addPropertyDialogState" (stateChanged)="setAddPropertyDialogState($event)" action>
+    <button hlmDialogTrigger hlmBtn>
+      <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Property
+    </button>
+    <ng-template hlmDialogPortal>
+      <hlm-dialog-content class="sm:max-w-2xl">
+        <div hlmDialogHeader>
+          <h3 hlmDialogTitle>Add Property</h3>
+          <p hlmDialogDescription>Save a new hotel property to TravelEase.</p>
+        </div>
+        <form
+          #propertyForm
+          class="grid grid-cols-2 gap-3"
+          (submit)="
+            createProperty(
+              $event,
+              propertyForm,
+              destinationIdInput.value,
+              propertyNameInput.value,
+              propertyAddressInput.value,
+              propertyPriceInput.value,
+              propertyAmenitiesInput.value,
+              propertyStatusInput.value
+            )
+          "
+        >
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="property-name">Property Name</label>
+            <input hlmInput id="property-name" placeholder="Sea Breeze Resort" #propertyNameInput required />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="property-destination">Destination ID</label>
+            <input hlmInput id="property-destination" type="number" min="1" placeholder="1" #destinationIdInput required />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="property-price">Price (&#8377;)</label>
+            <input hlmInput id="property-price" type="number" min="1" placeholder="4800" #propertyPriceInput required />
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="property-status">Status</label>
+            <select
+              id="property-status"
+              #propertyStatusInput
+              class="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm outline-none transition-[color,box-shadow] focus-visible:ring-[3px]"
+            >
+              <option value="ACTIVE" selected>Active</option>
+              <option value="INACTIVE">Inactive</option>
+              <option value="REVIEW">Review</option>
+            </select>
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="property-address">Address</label>
+            <textarea hlmTextarea id="property-address" rows="3" placeholder="Baga Beach, Goa" #propertyAddressInput required></textarea>
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="property-amenities">Amenities</label>
+            <input hlmInput id="property-amenities" placeholder="Pool, Breakfast, Wifi" #propertyAmenitiesInput />
+          </div>
+          @if (propertyError) {
+            <p class="col-span-2 text-sm text-destructive">{{ propertyError }}</p>
+          }
+          @if (propertySuccess) {
+            <p class="col-span-2 text-sm text-success">{{ propertySuccess }}</p>
+          }
+          <div hlmDialogFooter class="col-span-2">
+            <button hlmBtn type="submit" [disabled]="savingProperty">
+              {{ savingProperty ? 'Saving...' : 'Save Property' }}
+            </button>
+          </div>
+        </form>
+      </hlm-dialog-content>
+    </ng-template>
+  </hlm-dialog>
 </app-page-header>
+
+<hlm-dialog [state]="editPropertyDialogState" (stateChanged)="setEditPropertyDialogState($event)">
+  <ng-template hlmDialogPortal>
+    <hlm-dialog-content class="sm:max-w-2xl">
+      <div hlmDialogHeader>
+        <h3 hlmDialogTitle>Edit Property</h3>
+        <p hlmDialogDescription>Update hotel details saved in TravelEase.</p>
+      </div>
+      @if (editingHotel; as hotel) {
+        <form
+          #editPropertyForm
+          class="grid grid-cols-2 gap-3"
+          (submit)="
+            updateProperty(
+              $event,
+              editPropertyForm,
+              hotel,
+              editDestinationIdInput.value,
+              editPropertyNameInput.value,
+              editPropertyAddressInput.value,
+              editPropertyPriceInput.value,
+              editPropertyAmenitiesInput.value,
+              editPropertyStatusInput.value
+            )
+          "
+        >
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="edit-property-name">Property Name</label>
+            <input hlmInput id="edit-property-name" [value]="hotel.name" #editPropertyNameInput required />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="edit-property-destination">Destination ID</label>
+            <input
+              hlmInput
+              id="edit-property-destination"
+              type="number"
+              min="1"
+              [value]="hotel.destinationId"
+              #editDestinationIdInput
+              required
+            />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="edit-property-price">Price (&#8377;)</label>
+            <input
+              hlmInput
+              id="edit-property-price"
+              type="number"
+              min="1"
+              [value]="hotel.price"
+              #editPropertyPriceInput
+              required
+            />
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="edit-property-status">Status</label>
+            <select
+              id="edit-property-status"
+              [value]="hotel.statusValue"
+              #editPropertyStatusInput
+              class="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm outline-none transition-[color,box-shadow] focus-visible:ring-[3px]"
+            >
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+              <option value="REVIEW">Review</option>
+            </select>
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="edit-property-address">Address</label>
+            <textarea
+              hlmTextarea
+              id="edit-property-address"
+              rows="3"
+              [value]="hotel.address"
+              #editPropertyAddressInput
+              required
+            ></textarea>
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="edit-property-amenities">Amenities</label>
+            <input
+              hlmInput
+              id="edit-property-amenities"
+              [value]="hotel.amenities ?? ''"
+              #editPropertyAmenitiesInput
+            />
+          </div>
+          @if (editPropertyError) {
+            <p class="col-span-2 text-sm text-destructive">{{ editPropertyError }}</p>
+          }
+          @if (editPropertySuccess) {
+            <p class="col-span-2 text-sm text-success">{{ editPropertySuccess }}</p>
+          }
+          <div hlmDialogFooter class="col-span-2">
+            <button hlmBtn type="submit" [disabled]="savingEditProperty">
+              {{ savingEditProperty ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      }
+    </hlm-dialog-content>
+  </ng-template>
+</hlm-dialog>
 
 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
   @for (h of hotels; track h.id) {
@@ -17,18 +190,18 @@
             </p>
           </div>
           <span class="text-xs inline-flex items-center gap-1">
-            <ng-icon name="lucideStar" class="h-3 w-3 fill-warning text-warning" />{{ h.rating }}
+            <ng-icon name="lucideStar" class="h-3 w-3 fill-warning text-warning" />{{ h.ratingLabel }}
           </span>
         </div>
         <div class="flex justify-between text-xs text-muted-foreground">
           <span>{{ h.rooms }} rooms</span>
-          <span hlmBadge variant="outline" class="bg-success/10 text-success border-success/20">Live</span>
+          <span hlmBadge variant="outline" class="bg-success/10 text-success border-success/20">{{ h.status }}</span>
         </div>
         <div class="flex justify-between items-center pt-2 border-t">
           <p class="font-semibold">
-            ₹{{ h.price }}<span class="text-xs text-muted-foreground font-normal">/night</span>
+            &#8377;{{ h.price }}<span class="text-xs text-muted-foreground font-normal">/night</span>
           </p>
-          <button hlmBtn size="sm" variant="outline">Manage</button>
+          <button hlmBtn size="sm" variant="outline" (click)="openEditProperty(h)">Manage</button>
         </div>
       </div>
     </div>

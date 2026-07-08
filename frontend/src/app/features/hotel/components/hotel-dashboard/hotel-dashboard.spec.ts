@@ -7,13 +7,24 @@ import {
   lucideStar,
   lucideWallet,
 } from '@ng-icons/lucide';
-import { hotelBookings, rooms } from '@app/core/mock-data';
 import {
   HotelDashboard,
   buildOccupancyCalendarOption,
   calendarOccupancy,
   currentMonthDates,
 } from '@app/features/hotel/components/hotel-dashboard/hotel-dashboard';
+import { HotelProviderService } from '@app/features/hotel/services/hotel-provider.service';
+import {
+  availableRoomCount,
+  bookingsToday as expectedBookingsToday,
+  formatCompactCurrency,
+  groupRooms,
+  monthlyRevenue,
+} from '@app/features/hotel/services/hotel-provider-view-models';
+import {
+  TEST_PROVIDER_OVERVIEW,
+  createHotelProviderStub,
+} from '@app/features/hotel/testing/hotel-provider-test-data';
 
 describe('calendarOccupancy', () => {
   it('matches the sine-based formula from the React source for a few indices', () => {
@@ -58,21 +69,19 @@ describe('HotelDashboard', () => {
       imports: [HotelDashboard],
       providers: [
         provideIcons({ lucideCalendarDays, lucideDoorOpen, lucideHotel, lucideStar, lucideWallet }),
+        { provide: HotelProviderService, useValue: createHotelProviderStub() },
       ],
     }).compileComponents();
   });
 
-  it('computes all 4 stat values from rooms and hotelBookings', () => {
+  it('computes all 4 stat values from provider rooms and bookings', () => {
     const fixture = TestBed.createComponent(HotelDashboard);
     const c = fixture.componentInstance;
-    const totalRooms = rooms.reduce((s, r) => s + r.total, 0);
-    const availableRooms = rooms.reduce((s, r) => s + r.available, 0);
-    const revenue = hotelBookings.reduce((s, b) => s + b.total, 0);
 
-    expect(c.totalRooms).toBe(totalRooms);
-    expect(c.availableRooms).toBe(availableRooms);
-    expect(c.bookingsToday).toBe(hotelBookings.length);
-    expect(c.revenueMtd).toBe(`₹${(revenue / 1000).toFixed(0)}k`);
+    expect(c.totalRooms).toBe(TEST_PROVIDER_OVERVIEW.rooms.length);
+    expect(c.availableRooms).toBe(availableRoomCount(TEST_PROVIDER_OVERVIEW.rooms));
+    expect(c.bookingsToday).toBe(expectedBookingsToday(TEST_PROVIDER_OVERVIEW.bookings));
+    expect(c.revenueMtd).toBe(formatCompactCurrency(monthlyRevenue(TEST_PROVIDER_OVERVIEW.bookings)));
   });
 
   it('builds a calendar chart spanning the current month', () => {
@@ -83,21 +92,20 @@ describe('HotelDashboard', () => {
     expect(calendar.range).toEqual([expectedDates[0], expectedDates[expectedDates.length - 1]]);
   });
 
-  it('renders every hotelBookings entry in Recent Bookings (slice(0,4) keeps all 4)', () => {
+  it('renders provider bookings in Recent Bookings', () => {
     const fixture = TestBed.createComponent(HotelDashboard);
     fixture.detectChanges();
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    for (const b of hotelBookings) {
-      expect(text).toContain(b.guest);
-    }
-    expect(fixture.componentInstance.recentBookings).toHaveLength(4);
+    expect(text).toContain('Sarathy R');
+    expect(text).toContain('Anjali V');
+    expect(fixture.componentInstance.recentBookings).toHaveLength(2);
   });
 
-  it('renders every room type with the correct available/total numbers', () => {
+  it('renders grouped room types with the correct available/total numbers', () => {
     const fixture = TestBed.createComponent(HotelDashboard);
     fixture.detectChanges();
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    for (const r of rooms) {
+    for (const r of groupRooms(TEST_PROVIDER_OVERVIEW.rooms)) {
       expect(text).toContain(r.type);
       expect(text).toContain(`${r.available} / ${r.total}`);
     }
@@ -115,12 +123,12 @@ describe('HotelDashboard', () => {
     }
   });
 
-  it('renders the hardcoded rating average and review count', () => {
+  it('renders the provider rating average and review count', () => {
     const fixture = TestBed.createComponent(HotelDashboard);
     fixture.detectChanges();
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('4.7');
-    expect(text).toContain('182 reviews');
+    expect(text).toContain('4.3');
+    expect(text).toContain('4 reviews');
   });
 
   it('builds a rating distribution chart with all 5 star percentages', () => {
@@ -130,7 +138,7 @@ describe('HotelDashboard', () => {
     const series = (c.ratingOptions['series'] as any[])[0];
 
     for (const row of c.ratingRows) {
-      const idx = yAxis.data.indexOf(`${row.stars}★`);
+      const idx = yAxis.data.indexOf(`${row.stars}\u2605`);
       expect(series.data[idx]).toBe(row.pct);
     }
   });

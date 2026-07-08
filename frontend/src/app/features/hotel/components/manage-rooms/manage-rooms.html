@@ -1,7 +1,95 @@
 <app-page-header title="Manage Rooms" subtitle="Room types, pricing and live availability.">
-  <button hlmBtn action>
-    <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Room Type
-  </button>
+  <hlm-dialog [state]="roomDialogState" (stateChanged)="setRoomDialogState($event)" action>
+    <button hlmDialogTrigger hlmBtn>
+      <ng-icon name="lucidePlus" class="h-4 w-4 mr-1" />Add Room Type
+    </button>
+    <ng-template hlmDialogPortal>
+      <hlm-dialog-content class="sm:max-w-xl">
+        <div hlmDialogHeader>
+          <h3 hlmDialogTitle>Add Room Type</h3>
+          <p hlmDialogDescription>Create room inventory under one of your properties.</p>
+        </div>
+        <form
+          #roomForm
+          class="grid grid-cols-2 gap-3"
+          (submit)="
+            createRoomType(
+              $event,
+              roomForm,
+              hotelIdInput.value,
+              roomTypeInput.value,
+              capacityInput.value,
+              bedTypeInput.value,
+              roomPriceInput.value,
+              roomStatusInput.value,
+              roomCountInput.value
+            )
+          "
+        >
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="room-hotel">Property</label>
+            <select
+              id="room-hotel"
+              #hotelIdInput
+              required
+              class="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm outline-none transition-[color,box-shadow] focus-visible:ring-[3px]"
+            >
+              <option value="" selected disabled>Select property</option>
+              @for (hotel of hotels; track hotel.hotelId) {
+                <option [value]="hotel.hotelId">{{ hotel.hotelName }}</option>
+              }
+            </select>
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="room-type">Room Type</label>
+            <input hlmInput id="room-type" placeholder="Deluxe Sea View" #roomTypeInput required />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="room-capacity">Capacity</label>
+            <input hlmInput id="room-capacity" type="number" min="1" value="2" #capacityInput required />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="room-count">Rooms</label>
+            <input hlmInput id="room-count" type="number" min="1" value="1" #roomCountInput required />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="room-bed">Bed Type</label>
+            <input hlmInput id="room-bed" placeholder="King" #bedTypeInput required />
+          </div>
+          <div class="space-y-2">
+            <label hlmLabel for="room-price">Price (&#8377;)</label>
+            <input hlmInput id="room-price" type="number" min="1" placeholder="4800" #roomPriceInput required />
+          </div>
+          <div class="space-y-2 col-span-2">
+            <label hlmLabel for="room-status">Initial Availability</label>
+            <select
+              id="room-status"
+              #roomStatusInput
+              class="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm outline-none transition-[color,box-shadow] focus-visible:ring-[3px]"
+            >
+              <option value="AVAILABLE" selected>Available</option>
+              <option value="BOOKED">Booked</option>
+              <option value="MAINTENANCE">Maintenance</option>
+            </select>
+          </div>
+          @if (hotels.length === 0) {
+            <p class="col-span-2 text-sm text-muted-foreground">Create a property before adding room types.</p>
+          }
+          @if (roomError) {
+            <p class="col-span-2 text-sm text-destructive">{{ roomError }}</p>
+          }
+          @if (roomSuccess) {
+            <p class="col-span-2 text-sm text-success">{{ roomSuccess }}</p>
+          }
+          <div hlmDialogFooter class="col-span-2">
+            <button hlmBtn type="submit" [disabled]="savingRoom || hotels.length === 0">
+              {{ savingRoom ? 'Saving...' : 'Save Room Type' }}
+            </button>
+          </div>
+        </form>
+      </hlm-dialog-content>
+    </ng-template>
+  </hlm-dialog>
 </app-page-header>
 
 <div hlmCard>
@@ -19,12 +107,12 @@
           <div class="col-span-4 font-medium">{{ r.type }}</div>
           <div class="col-span-2 text-right tabular-nums">{{ r.total }}</div>
           <div class="col-span-2 text-right tabular-nums">{{ r.available }}</div>
-          <div class="col-span-2 text-right tabular-nums">₹{{ r.price.toLocaleString() }}</div>
+          <div class="col-span-2 text-right tabular-nums">&#8377;{{ r.price.toLocaleString() }}</div>
           <div class="col-span-2 text-right">
             <div class="inline-flex items-center gap-2">
-              <span class="text-xs tabular-nums">{{ r.occ.toFixed(0) }}%</span>
+              <span class="text-xs tabular-nums">{{ r.pct.toFixed(0) }}%</span>
               <div class="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                <div class="h-full bg-primary" [style.width.%]="r.occ"></div>
+                <div class="h-full bg-primary" [style.width.%]="r.pct"></div>
               </div>
             </div>
           </div>

@@ -1,19 +1,26 @@
 import { TestBed } from '@angular/core/testing';
-import { hotelBookings } from '@app/core/mock-data';
 import { HotelBookings } from '@app/features/hotel/components/hotel-bookings/hotel-bookings';
+import { HotelProviderService } from '@app/features/hotel/services/hotel-provider.service';
+import {
+  TEST_PROVIDER_OVERVIEW,
+  createHotelProviderStub,
+} from '@app/features/hotel/testing/hotel-provider-test-data';
 
 describe('HotelBookings', () => {
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [HotelBookings] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [HotelBookings],
+      providers: [{ provide: HotelProviderService, useValue: createHotelProviderStub() }],
+    }).compileComponents();
   });
 
-  it('renders every hotelBookings entry guest and room', () => {
+  it('renders every provider booking guest and room', () => {
     const fixture = TestBed.createComponent(HotelBookings);
     fixture.detectChanges();
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    for (const b of hotelBookings) {
-      expect(text).toContain(b.guest);
-      expect(text).toContain(b.room);
+    for (const b of TEST_PROVIDER_OVERVIEW.bookings) {
+      expect(text).toContain(b.bookedByUserName);
+      expect(text).toContain(b.roomType);
     }
   });
 

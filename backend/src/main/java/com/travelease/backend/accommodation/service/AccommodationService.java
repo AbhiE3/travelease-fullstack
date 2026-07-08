@@ -60,6 +60,8 @@ public interface AccommodationService {
 
     List<HotelBookingResponse> getMyBookings(String currentUserEmail);
 
+    List<HotelBookingResponse> getProviderBookings();
+
     HotelBillResponse getBill(UUID bookingId);
 
     HotelBookingResponse attachBookingToTrip(UUID tripId, AttachHotelBookingRequest request);

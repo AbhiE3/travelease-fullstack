@@ -10,6 +10,7 @@ public record HotelBookingResponse(
         UUID hotelId,
         String hotelName,
         UUID bookedByUserId,
+        String bookedByUserName,
         LocalDate checkInDate,
         LocalDate checkOutDate,
         String roomType,

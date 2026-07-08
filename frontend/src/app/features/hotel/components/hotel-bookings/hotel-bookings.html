@@ -15,9 +15,9 @@
         <div class="grid grid-cols-12 px-4 py-3 items-center border-b last:border-0 text-sm">
           <div class="col-span-3 font-medium">{{ b.guest }}</div>
           <div class="col-span-3 text-muted-foreground">{{ b.room }}</div>
-          <div class="col-span-2">{{ b.checkIn }} → {{ b.checkOut }}</div>
+          <div class="col-span-2">{{ b.checkIn }} &rarr; {{ b.checkOut }}</div>
           <div class="col-span-1 text-right tabular-nums">{{ b.guests }}</div>
-          <div class="col-span-2 text-right tabular-nums">₹{{ b.total.toLocaleString() }}</div>
+          <div class="col-span-2 text-right tabular-nums">&#8377;{{ b.total.toLocaleString() }}</div>
           <div class="col-span-1 text-right"><app-status-badge [status]="b.status" /></div>
         </div>
       }

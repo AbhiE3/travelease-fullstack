@@ -1,4 +1,4 @@
-<app-page-header title="Hotel Partner Dashboard" subtitle="Sea Breeze Resort · Baga Beach, Goa" />
+<app-page-header title="Hotel Partner Dashboard" [subtitle]="dashboardSubtitle" />
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
   <div hlmCard>
@@ -34,7 +34,7 @@
 <div class="grid lg:grid-cols-3 gap-6">
   <div hlmCard class="lg:col-span-2">
     <div hlmCardHeader>
-      <h3 hlmCardTitle>Occupancy Calendar — {{ calendarMonthLabel }}</h3>
+      <h3 hlmCardTitle>Occupancy Calendar &mdash; {{ calendarMonthLabel }}</h3>
     </div>
     <div hlmCardContent>
       <app-echart [options]="calendarOptions" height="220px" />
@@ -50,7 +50,7 @@
         <div class="flex items-center justify-between text-sm">
           <div>
             <p class="font-medium">{{ b.guest }}</p>
-            <p class="text-xs text-muted-foreground">{{ b.room }} · {{ b.checkIn }}</p>
+            <p class="text-xs text-muted-foreground">{{ b.room }} &middot; {{ b.checkIn }}</p>
           </div>
           <app-status-badge [status]="b.status" />
         </div>
@@ -68,7 +68,7 @@
       @for (r of roomInventory; track r.id) {
         <div class="rounded-md border p-4">
           <p class="font-medium">{{ r.type }}</p>
-          <p class="text-xs text-muted-foreground">₹{{ r.price.toLocaleString() }}/night</p>
+          <p class="text-xs text-muted-foreground">&#8377;{{ r.price.toLocaleString() }}/night</p>
           <div class="flex items-center justify-between mt-3 text-sm">
             <span class="text-muted-foreground">Available</span>
             <span class="font-semibold tabular-nums">{{ r.available }} / {{ r.total }}</span>
